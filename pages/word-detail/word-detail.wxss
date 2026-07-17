@@ -1,0 +1,258 @@
+/* pages/word-detail/word-detail.wxss */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f7fa;
+}
+
+/* 加载状态 */
+.loading-screen,
+.error-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  text-align: center;
+}
+
+.loading-text,
+.error-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-top: 30rpx;
+}
+
+.error-icon {
+  font-size: 80rpx;
+}
+
+.btn-home {
+  margin-top: 60rpx;
+  padding: 24rpx 48rpx;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+}
+
+.btn-home::after {
+  border: none;
+}
+
+/* 详情内容 */
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.audio-control-area {
+  padding: 40rpx 30rpx 30rpx;
+  background-color: white;
+  border-bottom-left-radius: 30rpx;
+  border-bottom-right-radius: 30rpx;
+}
+
+.btn-audio-large {
+  width: 100%;
+  padding: 36rpx 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.btn-audio-hover {
+  transform: scale(0.98);
+}
+
+.btn-audio-large::after {
+  border: none;
+}
+
+.audio-icon {
+  font-size: 48rpx;
+  margin-right: 16rpx;
+}
+
+.audio-text {
+  color: white;
+}
+
+/* 单词卡片 */
+.word-card {
+  margin: 30rpx;
+  padding: 40rpx;
+  background-color: white;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.word-en {
+  display: block;
+  font-size: 64rpx;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 16rpx;
+  text-align: center;
+}
+
+.word-phonetic {
+  display: block;
+  font-size: 36rpx;
+  color: #999;
+  text-align: center;
+  font-family: "Lucida Sans Unicode", sans-serif;
+  margin-bottom: 30rpx;
+}
+
+.word-meaning-section {
+  margin-bottom: 30rpx;
+}
+
+.word-meaning {
+  font-size: 32rpx;
+  line-height: 1.6;
+  color: #333;
+}
+
+.example-section {
+  padding: 24rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  border-left: 4rpx solid #667eea;
+}
+
+.example-title {
+  font-size: 24rpx;
+  color: #667eea;
+  margin-right: 10rpx;
+}
+
+.example-en {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+  font-style: italic;
+}
+
+.example-cn {
+  display: block;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 学习操作区 */
+.action-area {
+  padding: 30rpx;
+  background-color: white;
+  border-radius: 30rpx 30rpx 0 0;
+}
+
+.learning-status {
+  padding: 30rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+}
+
+.status-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 20rpx;
+}
+
+.status-value {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.status-value.mastered {
+  color: #51cf66;
+}
+
+.status-value.learning {
+  color: #ffa500;
+}
+
+.memory-info {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.rating-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.btn-rate {
+  padding: 24rpx 0;
+  border-radius: 16rpx;
+  border: none;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.btn-rate::after {
+  border: none;
+}
+
+.btn-rate:active {
+  transform: scale(0.95);
+}
+
+.btn-wrong {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+}
+
+.btn-fuzzy {
+  background: linear-gradient(135deg, #ffa500, #ff9500);
+}
+
+.btn-known {
+  background: linear-gradient(135deg, #51cf66, #40c057);
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 30rpx;
+  border-radius: 16rpx;
+  border: none;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #666;
+}
+
+.btn-primary::after,
+.btn-secondary::after {
+  border: none;
+}

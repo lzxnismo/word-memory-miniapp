@@ -1,0 +1,305 @@
+/* pages/flash-card/flash-card.wxss */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f0f2f5;
+}
+
+/* 进度条区域 */
+.progress-header {
+  padding: 30rpx;
+  background-color: white;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.progress-info text {
+  font-size: 28rpx;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* 卡片区域 */
+.card-area {
+  flex: 1;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.flash-card {
+  width: 100%;
+  max-width: 750rpx;
+  min-height: 600rpx;
+  perspective: 1000rpx;
+  cursor: pointer;
+}
+
+/* 翻转动画容器 */
+.flash-card .card-front,
+.flash-card .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  border-radius: 30rpx;
+  box-shadow: 0 12rpx 40rpx rgba(102, 126, 234, 0.15);
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.flash-card .card-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 2;
+}
+
+.flash-card .card-back {
+  background-color: white;
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+.flash-card.flipped .card-front {
+  transform: rotateY(180deg);
+}
+
+.flash-card.flipped .card-back {
+  transform: rotateY(0deg);
+}
+
+/* 单词样式 */
+.word-en {
+  font-size: 64rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.card-back .word-meaning {
+  font-size: 40rpx;
+  color: #333;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.word-phonetic {
+  font-size: 32rpx;
+  opacity: 0.9;
+  margin-bottom: 20rpx;
+  font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+}
+
+/* 例句区域 */
+.example-section {
+  width: 100%;
+  margin-top: 30rpx;
+  padding-top: 30rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.3);
+}
+
+.card-front .example-section {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.example-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-right: 10rpx;
+}
+
+.example-en {
+  display: block;
+  font-size: 32rpx;
+  margin-bottom: 10rpx;
+  font-style: italic;
+}
+
+.example-cn {
+  display: block;
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.card-back .example-label {
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.card-back .example-en {
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.card-back .example-cn {
+  color: #999;
+}
+
+/* 翻回提示 */
+.flip-hint {
+  margin-top: 40rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 音频控制按钮 */
+.audio-control {
+  margin-top: 40rpx;
+  padding: 20rpx 40rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10rpx);
+  cursor: pointer;
+}
+
+.audio-icon {
+  font-size: 48rpx;
+}
+
+/* 质量评分按钮组 */
+.rating-area {
+  padding: 30rpx;
+  background-color: white;
+  border-radius: 30rpx 30rpx 0 0;
+}
+
+.rating-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.btn-rate {
+  padding: 30rpx 0;
+  border-radius: 16rpx;
+  border: none;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.btn-rate::after {
+  border: none;
+}
+
+.btn-rate-wrong {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+}
+
+.btn-rate-fuzzy {
+  background: linear-gradient(135deg, #ffa500, #ff9500);
+}
+
+.btn-rate-known {
+  background: linear-gradient(135deg, #51cf66, #40c057);
+}
+
+.btn-rate:active {
+  transform: scale(0.95);
+}
+
+.btn-skip {
+  width: 100%;
+  padding: 30rpx;
+  background-color: transparent;
+  color: #667eea;
+  border: 2rpx solid #667eea;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+}
+
+.btn-skip::after {
+  border: none;
+}
+
+/* 完成页面 */
+.completion-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+  text-align: center;
+}
+
+.completion-icon {
+  font-size: 120rpx;
+  margin-bottom: 40rpx;
+}
+
+.completion-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.completion-stats {
+  font-size: 32rpx;
+  color: #667eea;
+  margin-bottom: 60rpx;
+}
+
+.completion-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  width: 100%;
+  max-width: 400rpx;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 30rpx;
+  border-radius: 16rpx;
+  border: none;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #667eea;
+  border: 2rpx solid #667eea;
+}
+
+/* 加载状态 */
+.loading-screen,
+.error-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.loading-text,
+.error-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-top: 30rpx;
+}

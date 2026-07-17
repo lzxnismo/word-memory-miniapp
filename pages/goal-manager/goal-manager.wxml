@@ -1,0 +1,91 @@
+<!-- pages/goal-manager/goal-manager.wxml -->
+<view class="container">
+  <!-- 目标概览 -->
+  <view class="header">
+    <text class="title">🎯 学习目标</text>
+    <text class="subtitle">设定目标，坚持学习</text>
+  </view>
+
+  <!-- 当前活跃目标 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">📋 当前目标</text>
+      <button class="btn-create" size="mini" bindtap="showCreateDialog">+ 新建</button>
+    </view>
+
+    <view class="goal-card" wx:for="{{activeGoals}}" wx:key="id" data-id="{{item.id}}" bindtap="editGoal">
+      <view class="goal-type-badge {{item.type}}">
+        {{item.type === 'daily' ? '每日' : item.type === 'weekly' ? '每周' : '每月'}}
+      </view>
+      <view class="goal-info">
+        <text class="goal-title">{{item.title}}</text>
+        <view class="goal-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{item.progress_percent}}%"></view>
+          </view>
+          <text class="progress-text">{{item.current_value}}/{{item.target_value}} {{item.unit}}</text>
+        </view>
+        <text class="goal-deadline" wx:if="{{item.deadline}}">⏰ {{item.deadline}}</text>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{activeGoals.length === 0}}">
+      <text class="tip-icon">🎯</text>
+      <text class="tip-text">还没有设定目标，点击右上角新建吧！</text>
+    </view>
+  </view>
+
+  <!-- 已完成目标 -->
+  <view class="section" wx:if="{{completedGoals.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">✅ 已完成</text>
+    </view>
+    <view class="completed-list">
+      <view class="completed-item" wx:for="{{completedGoals}}" wx:key="id">
+        <text class="completed-icon">🏆</text>
+        <text class="completed-title">{{item.title}}</text>
+        <text class="completed-date">{{item.completed_at}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 创建/编辑对话框 -->
+  <view class="dialog-mask" wx:if="{{showDialog}}">
+    <view class="dialog">
+      <text class="dialog-title">{{editingId ? '编辑目标' : '新建学习目标'}}</text>
+      
+      <view class="form-group">
+        <text class="form-label">目标名称</text>
+        <input class="form-input" placeholder="如：每天学习30个新词" value="{{form.title}}" bindinput="onTitleInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="form-label">目标类型</text>
+        <view class="type-selector">
+          <view class="type-option {{form.type === 'daily' ? 'selected' : ''}}" bindtap="selectType" data-type="daily">每日</view>
+          <view class="type-option {{form.type === 'weekly' ? 'selected' : ''}}" bindtap="selectType" data-type="weekly">每周</view>
+          <view class="type-option {{form.type === 'monthly' ? 'selected' : ''}}" bindtap="selectType" data-type="monthly">每月</view>
+        </view>
+      </view>
+      
+      <view class="form-group">
+        <text class="form-label">目标数量</text>
+        <input class="form-input" type="number" placeholder="如：30" value="{{form.target_value}}" bindinput="onTargetInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="form-label">单位</text>
+        <view class="unit-selector">
+          <view class="unit-option {{form.unit === '词' ? 'selected' : ''}}" bindtap="selectUnit" data-unit="词">个词</view>
+          <view class="unit-option {{form.unit === '分钟' ? 'selected' : ''}}" bindtap="selectUnit" data-unit="分钟">分钟</view>
+          <view class="unit-option {{form.unit === '次' ? 'selected' : ''}}" bindtap="selectUnit" data-unit="次">复习次</view>
+        </view>
+      </view>
+      
+      <view class="dialog-actions">
+        <button class="btn-cancel" bindtap="hideDialog">取消</button>
+        <button class="btn-confirm" bindtap="saveGoal">{{editingId ? '保存' : '创建'}}</button>
+      </view>
+    </view>
+  </view>
+</view>

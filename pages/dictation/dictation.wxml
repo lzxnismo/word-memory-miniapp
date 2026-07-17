@@ -1,0 +1,102 @@
+<!-- pages/dictation/dictation.wxml -->
+<view class="container">
+  <!-- 头部信息 -->
+  <view class="header-section">
+    <view class="header-info">
+      <text class="total-count">{{currentRound.length}}个单词</text>
+      <text class="progress-text">{{currentIndex + 1}}/{{currentRound.length}}</text>
+    </view>
+    <slider 
+      value="{{currentIndex}}" 
+      max="{{currentRound.length - 1}}"
+      show-value 
+      block-size="16"
+      activeColor="#667eea"
+      backgroundColor="#e0e0e0"
+      bindchange="onSliderChange"
+    />
+  </view>
+
+  <!-- 听写区域 -->
+  <view class="quiz-area">
+    <!-- 发音按钮和计时器 -->
+    <view class="quiz-top">
+      <button class="btn-play-audio" bindtap="playAudio">
+        🔊 播放发音
+      </button>
+      
+      <view class="timer-container" wx:if="{{countingDown}}">
+        <text class="timer-label">剩余时间：</text>
+        <text class="timer-value">{{remainingSeconds}}秒</text>
+      </view>
+    </view>
+
+    <!-- 输入框 -->
+    <view class="input-section">
+      <textarea
+        class="word-input"
+        placeholder="根据听到的发音输入单词..."
+        value="{{userInput}}"
+        maxlength="50"
+        bindinput="onInput"
+        auto-height
+        fixed
+      />
+      
+      <view class="input-hints" wx:if="{{showHints}}">
+        <button class="hint-btn btn-hint-first" bindtap="showHintFirst">👉 首字母提示</button>
+        <button class="hint-btn btn-hint-meaning" bindtap="showHintMeaning">👉 查看中文释义</button>
+      </view>
+    </view>
+
+    <!-- 控制按钮 -->
+    <view class="control-buttons">
+      <button class="btn-primary" wx:if="{{!hasAnswered}}" bindtap="submitAnswer">提交答案</button>
+      <view class="result-area" wx:if="{{hasAnswered}}">
+        <view class="answer-feedback {{isCorrect ? 'correct' : 'wrong'}}">
+          <text class="feedback-icon">{{isCorrect ? '✅' : '❌'}}</text>
+          <text class="feedback-text">{{isCorrect ? '回答正确！' : '回答错误'}}</text>
+        </view>
+        
+        <view class="correct-answer" wx:if="{{!isCorrect}}">
+          <text class="correct-word">正确答案：</text>
+          <text class="correct-spelling">{{currentWord.word}}</text>
+          <text class="correct-phonetic">{{currentWord.phonetic}}</text>
+        </view>
+        
+        <view class="explanation" wx:if="{{currentWord.meaning}}">
+          <text class="meaning-label">释义：</text>
+          <text class="meaning-text">{{currentWord.meaning}}</text>
+        </view>
+        
+        <button class="btn-next" bindtap="nextQuestion">下一题 ➜</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 完成页面 -->
+  <view class="completion-screen" wx:if="{{learningComplete}}">
+    <view class="completion-icon">🎉</view>
+    <text class="completion-title">听写完成！</text>
+    
+    <view class="score-display">
+      <text class="score-num">{{score}}</text>
+      <text class="score-total">/{{totalWords}}</text>
+    </view>
+    
+    <view class="score-percentage">{{accuracy}}% 正确率</view>
+    
+    <view class="performance-msg">{{performanceMessage}}</view>
+    
+    <view class="action-buttons">
+      <button class="btn-primary" bindtap="retryDictation">再来一次</button>
+      <button class="btn-secondary" bindtap="goHome">返回首页</button>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-screen" wx:if="{{loading}}">
+    <text class="loading-icon">⏳</text>
+    <text class="loading-text">正在准备听写测试...</text>
+  </view>
+</view>

@@ -1,0 +1,186 @@
+/* pages/settings/settings.wxss */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.header-section {
+  padding: 40rpx 30rpx 30rpx;
+  background-color: white;
+  border-bottom-left-radius: 30rpx;
+  border-bottom-right-radius: 30rpx;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #667eea;
+}
+
+/* 用户卡片 */
+.user-card {
+  margin: 30rpx;
+  padding: 40rpx;
+  background-color: white;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.avatar-placeholder {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  color: white;
+  margin-right: 30rpx;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.username {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.user-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #eee;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 20rpx;
+  color: #999;
+}
+
+/* 通用区块 */
+.section {
+  padding: 0 30rpx 30rpx;
+}
+
+.section-header {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 设置列表 */
+.settings-list {
+  background-color: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item:active {
+  background-color: #f8f9fa;
+}
+
+.item-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+  min-width: 40rpx;
+}
+
+.item-name {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.item-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.item-desc.warning {
+  color: #ff6b6b;
+}
+
+.item-right,
+.arrow,
+.action-text {
+  font-size: 32rpx;
+  color: #ccc;
+}
+
+.update-status {
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+/* 版权信息 */
+.footer-section {
+  margin-top: auto;
+  padding: 40rpx 30rpx 60rpx;
+  background-color: white;
+  text-align: center;
+}
+
+.copyright {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.studio-credit {
+  font-size: 22rpx;
+  color: #bbb;
+}

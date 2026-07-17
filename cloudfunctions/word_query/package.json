@@ -1,0 +1,12 @@
+{
+  "name": "word_query",
+  "version": "1.0.0",
+  "description": "单词查询云函数 - 搜索/列表/复习队列",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "mysql2": "^3.6.5"
+  },
+  "author": "一帮人马工作室（QQ691481548）",
+  "license": "ISC"
+}

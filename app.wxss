@@ -1,0 +1,157 @@
+/* app.wxss */
+
+/* 全局样式变量 */
+:root {
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --bg-light: #f5f5f5;
+  --bg-white: #ffffff;
+}
+
+/* 全局重置 */
+page {
+  background-color: var(--bg-light);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* 通用容器 */
+.container {
+  padding: 40rpx;
+  min-height: 100vh;
+}
+
+/* 卡片组件 */
+.card {
+  background-color: var(--bg-white);
+  border-radius: 24rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: var(--text-primary);
+}
+
+/* 按钮样式 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 48rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background-color: var(--bg-white);
+  color: var(--primary-color);
+  border: 2rpx solid var(--primary-color);
+}
+
+/* 列表项 */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40rpx;
+  background-color: var(--bg-white);
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.list-item-title {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.list-item-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-top: 8rpx;
+}
+
+/* 进度条 */
+.progress-bar {
+  height: 12rpx;
+  background-color: #e0e0e0;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  transition: width 0.3s ease;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.tag-success {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.tag-warning {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.tag-info {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  color: #cccccc;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #999999;
+  margin-bottom: 40rpx;
+}

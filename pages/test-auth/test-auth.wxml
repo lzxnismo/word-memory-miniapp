@@ -1,0 +1,63 @@
+<!-- pages/test-auth/test-auth.wxml -->
+<view class="container">
+  <view class="test-header">
+    <text class="title">🧪 权限测试页</text>
+    <text class="subtitle">验证宽松授权方案</text>
+  </view>
+
+  <!-- 当前授权状态 -->
+  <view class="status-card" wx:if="{{!needAuth}}">
+    <text class="icon">✅</text>
+    <text class="label">已授权</text>
+    <text class="openid">{{openId || '加载中...'}}</text>
+  </view>
+
+  <view class="status-card warning" wx:else>
+    <text class="icon">⚠️</text>
+    <text class="label">未授权 - 只能浏览单词库</text>
+    <text class="tip">点击按钮即可授权</text>
+  </view>
+
+  <!-- 功能测试列表 -->
+  <view class="test-list">
+    <view class="test-item">
+      <view class="test-name">① 闪卡学习</view>
+      <button class="btn-test {{needAuth ? 'disabled' : ''}}" bindtap="testFlashCard">
+        {{needAuth ? '❌ 需要授权' : '✅ 可以测试'}}
+      </button>
+    </view>
+
+    <view class="test-item">
+      <view class="test-name">② 听写测试</view>
+      <button class="btn-test {{needAuth ? 'disabled' : ''}}" bindtap="testDictation">
+        {{needAuth ? '❌ 需要授权' : '✅ 可以测试'}}
+      </button>
+    </view>
+
+    <view class="test-item">
+      <view class="test-name">③ 每日计划</view>
+      <button class="btn-test {{needAuth ? 'disabled' : ''}}" bindtap="testPlan">
+        {{needAuth ? '❌ 需要授权' : '✅ 可以测试'}}
+      </button>
+    </view>
+
+    <view class="test-item success">
+      <view class="test-name">④ 单词本（浏览）</view>
+      <button class="btn-test btn-success" bindtap="testWordsList">
+        ✅ 无需授权
+      </button>
+    </view>
+  </view>
+
+  <!-- 授权操作区 -->
+  <view class="auth-section">
+    <view class="section-title">💡 授权操作</view>
+    <button class="btn-authorize" bindtap="forceAuthorize">
+      💚 强制授权（模拟成功）
+    </button>
+    
+    <button class="btn-reset" bindtap="resetAuth">
+      🔄 重置授权（清除缓存，重新体验）
+    </button>
+  </view>
+</view>

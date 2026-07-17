@@ -1,0 +1,111 @@
+<!-- pages/plan-daily/plan-daily.wxml -->
+<view class="container">
+  <view class="header-section">
+    <text class="page-title">📅 每日学习计划</text>
+  </view>
+
+  <!-- 今日学习进度概览 -->
+  <view class="progress-card">
+    <view class="progress-header">
+      <text class="section-title">今日目标</text>
+      <text class="progress-value">{{dailyProgress}}/{{dailyLimit}}</text>
+    </view>
+    
+    <slider 
+      value="{{dailyProgress / dailyLimit}}" 
+      max="1"
+      show-value 
+      block-size="20"
+      activeColor="#667eea"
+      backgroundColor="#e0e0e0"
+    />
+    
+    <view class="progress-details">
+      <view class="detail-item">
+        <text class="label">待复习：</text>
+        <text class="value reviewing">{{reviewCount}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">已学新词：</text>
+        <text class="value learned">{{learnedToday}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 当前计划任务 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🎯 当前任务</text>
+    </view>
+    
+    <view class="task-list">
+      <view class="task-item completed" wx:if="{{completedTasks.length > 0}}">
+        <text class="task-icon">✅</text>
+        <view class="task-content">
+          <text class="task-name">昨日复习完成</text>
+          <text class="task-time">已完成</text>
+        </view>
+      </view>
+      
+      <view class="task-item active" wx:if="{{reviewCount > 0}}">
+        <text class="task-icon">📚</text>
+        <view class="task-content">
+          <text class="task-name">复习 {{reviewCount}} 个单词</text>
+          <text class="task-time">剩余 {{reviewCount}} 个</text>
+        </view>
+        <button class="btn-start-task" bindtap="startReviewTask">开始</button>
+      </view>
+      
+      <view class="task-item inactive" wx:if="{{remainingNew > 0}}">
+        <text class="task-icon">✨</text>
+        <view class="task-content">
+          <text class="task-name">学习新词 {{remainingNew}} 个</text>
+          <text class="task-time">累计已学 {{learnedToday}}</text>
+        </view>
+        <button class="btn-start-task" wx:if="{{learnedToday < dailyLimit}}" bindtap="startNewTask">开始</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习目标设置 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">⚙️ 学习计划</text>
+    </view>
+    
+    <view class="settings-form">
+      <view class="form-item">
+        <text class="form-label">每日学习上限</text>
+        <picker mode="selector" range="{{limitOptions}}" bindchange="onLimitChange" value="{{currentLimitIndex}}">
+          <view class="picker-value">{{limitOptions[currentLimitIndex]}}个/天</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">建议新词比例</text>
+        <picker mode="selector" range="{{ratioOptions}}" bindchange="onRatioChange" value="{{currentRatioIndex}}">
+          <view class="picker-value">{{ratioOptions[currentRatioIndex]}}</view>
+        </picker>
+      </view>
+      
+      <button class="btn-save" bindtap="savePlan">保存设置</button>
+    </view>
+  </view>
+
+  <!-- 历史学习记录 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">📊 本周学习统计</text>
+    </view>
+    
+    <view class="week-stats">
+      <view class="stat-row" wx:for="{{weekStats}}" wx:key="day">
+        <view class="day-name">{{item.day}}</view>
+        <view class="stat-bar-container">
+          <view class="stat-bar" style="width:{{(item.count / dailyLimit * 100)}}%"></view>
+        </view>
+        <text class="stat-count">{{item.count}}词</text>
+      </view>
+    </view>
+  </view>
+</view>

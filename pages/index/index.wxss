@@ -1,0 +1,199 @@
+/* pages/index/index.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 头部问候 */
+.header {
+  margin-bottom: 30rpx;
+}
+
+.greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20rpx;
+  color: white;
+}
+
+.greeting .title {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.greeting .subtitle {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 统计卡片 */
+.stats-cards {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.stat-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 30rpx 20rpx;
+  background-color: white;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.stat-card:active {
+  transform: scale(0.98);
+}
+
+.stat-icon {
+  font-size: 56rpx;
+  margin-right: 20rpx;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #667eea;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 章节样式 */
+.section {
+  margin-bottom: 30rpx;
+  background-color: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: #667eea;
+}
+
+/* 单词列表 */
+.word-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.word-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  border: 1rpx solid #eee;
+  border-radius: 12rpx;
+  transition: background-color 0.2s;
+}
+
+.word-item:active {
+  background-color: #f8f9fa;
+}
+
+.word-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.word-en {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.word-cn {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.btn-quick-review {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  font-size: 24rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 8rpx;
+  margin-left: 20rpx;
+}
+
+.btn-quick-review::after {
+  border: none;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+}
+
+.tip-icon {
+  font-size: 64rpx;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.tip-text {
+  font-size: 28rpx;
+}
+
+/* 快捷功能 */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  cursor: pointer;
+}
+
+.action-icon {
+  font-size: 56rpx;
+  margin-bottom: 12rpx;
+}
+
+.action-label {
+  font-size: 24rpx;
+  color: #333;
+}

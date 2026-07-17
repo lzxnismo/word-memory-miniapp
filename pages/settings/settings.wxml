@@ -1,0 +1,128 @@
+<!-- pages/settings/settings.wxml -->
+<view class="container">
+  <view class="header-section">
+    <text class="page-title">⚙️ 设置</text>
+  </view>
+
+  <!-- 用户信息 -->
+  <view class="user-card">
+    <view class="user-info">
+      <view class="avatar-placeholder">👤</view>
+      <view class="info-content">
+        <text class="username">用户 ID: {{userId}}</text>
+        <text class="subtitle">开始你的学习之旅吧！</text>
+      </view>
+    </view>
+    <view class="user-stats" wx:if="{{statsReady}}">
+      <view class="stat-item">
+        <text class="stat-value">{{totalLearned}}</text>
+        <text class="stat-label">已学单词</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{masteredCount}}</text>
+        <text class="stat-label">已掌握</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{accuracy}}%</text>
+        <text class="stat-label">正确率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习偏好设置 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">📚 学习设置</text>
+    </view>
+    
+    <view class="settings-list">
+      <view class="setting-item" bindtap="goToDailyPlan">
+        <view class="item-left">
+          <text class="item-icon">📅</text>
+          <text class="item-name">每日学习计划</text>
+          <text class="item-desc">设置每日学习目标和提醒</text>
+        </view>
+        <view class="item-right">
+          <text class="arrow">›</text>
+        </view>
+      </view>
+      
+      <view class="setting-item" bindtap="toggleSound">
+        <view class="item-left">
+          <text class="item-icon">{{soundEnabled ? '🔊' : '🔇'}}</text>
+          <text class="item-name">自动发音</text>
+          <text class="item-desc">{{soundEnabled ? '已开启' : '已关闭'}}单词音频</text>
+        </view>
+        <switch 
+          checked="{{soundEnabled}}" 
+          color="#667eea"
+          bindchange="onSoundChange"
+        />
+      </view>
+      
+      <view class="setting-item" bindtap="resetProgress">
+        <view class="item-left">
+          <text class="item-icon">🔄</text>
+          <text class="item-name">重置学习进度</text>
+          <text class="item-desc warning">清空所有学习记录，不可恢复</text>
+        </view>
+        <text class="action-text" style="color:#ff6b6b;">重置 →</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 应用设置 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🛠 其他设置</text>
+    </view>
+    
+    <view class="settings-list">
+      <view class="setting-item" bindtap="showAbout">
+        <view class="item-left">
+          <text class="item-icon">ℹ️</text>
+          <text class="item-name">关于应用</text>
+          <text class="item-desc">Word Memory v1.0.0</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+      
+      <view class="setting-item" bindtap="checkUpdate">
+        <view class="item-left">
+          <text class="item-icon">✨</text>
+          <text class="item-name">检查更新</text>
+          <text class="item-desc">当前版本：v1.0.0 (最新版)</text>
+        </view>
+        <text class="update-status" style="color:#51cf66;">✓</text>
+      </view>
+      
+      <view class="setting-item" bindtap="clearCache">
+        <view class="item-left">
+          <text class="item-icon">🧹</text>
+          <text class="item-name">清除缓存</text>
+          <text class="item-desc">清理本地缓存数据</text>
+        </view>
+        <text class="action-text">清除</text>
+      </view>
+      
+      <view class="setting-item" bindtap="feedback">
+        <view class="item-left">
+          <text class="item-icon">💬</text>
+          <text class="item-name">意见反馈</text>
+          <text class="item-desc">帮助我们做得更好</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 版权信息 -->
+  <view class="footer-section">
+    <view class="copyright">
+      <text>© 2026 Word Memory App</text>
+    </view>
+    <view class="studio-credit">
+      <text>设计者：一帮人马工作室（QQ691481548）</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,12 @@
+{
+  "name": "record_review",
+  "version": "1.0.0",
+  "description": "记录复习+SM-2算法云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "mysql2": "^3.6.5"
+  },
+  "author": "一帮人马工作室（QQ691481548）",
+  "license": "ISC"
+}

@@ -1,0 +1,28 @@
+<!-- components/auth-dialog/auth-dialog.wxml -->
+<view class="auth-mask" wx:if="{{show}}" bindtap="handleMaskTap">
+  <view class="auth-dialog">
+    <view class="dialog-header">
+      <text class="dialog-icon">🔐</text>
+      <text class="dialog-title">需要授权才能使用完整功能</text>
+    </view>
+
+    <view class="dialog-content">
+      <view class="tip-icon">⚠️</view>
+      <text class="tip-text">为了保存您的学习进度和复习记录</text>
+      <view class="feature-list">
+        <view class="feature-item">✓ 记住每个单词的学习状态</view>
+        <view class="feature-item">✓ 生成个性化的复习计划</view>
+        <view class="feature-item">✓ 查看学习统计和进步曲线</view>
+      </view>
+    </view>
+
+    <view class="dialog-footer">
+      <button class="btn-secondary" bindtap="handleCancel">
+        <text>稍后再说</text>
+      </button>
+      <button class="btn-primary" bindtap="handleAuthorize">
+        <text>允许授权</text>
+      </button>
+    </view>
+  </view>
+</view>

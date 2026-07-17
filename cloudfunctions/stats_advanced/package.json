@@ -1,0 +1,10 @@
+{
+  "name": "stats_advanced",
+  "version": "1.0.0",
+  "description": "高级数据统计云函数 - 直连 MySQL",
+  "main": "index.js",
+  "dependencies": {
+    "mysql2": "^3.9.0",
+    "wx-server-sdk": "~2.6.3"
+  }
+}

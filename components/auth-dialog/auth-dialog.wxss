@@ -1,0 +1,107 @@
+/* components/auth-dialog/auth-dialog.wxss */
+.auth-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.auth-dialog {
+  width: 580rpx;
+  padding: 40rpx;
+  background: white;
+  border-radius: 30rpx;
+  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.3);
+}
+
+.dialog-header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.dialog-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.dialog-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  line-height: 1.4;
+}
+
+.dialog-content {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 30rpx;
+  border-radius: 20rpx;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.tip-icon {
+  font-size: 60rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.tip-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  display: block;
+  margin-bottom: 30rpx;
+}
+
+.feature-list {
+  margin-top: 20rpx;
+}
+
+.feature-item {
+  font-size: 26rpx;
+  color: #667eea;
+  padding: 10rpx 0;
+  line-height: 1.6;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-secondary,
+.btn-primary {
+  flex: 1;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #666;
+}
+
+.btn-secondary::after {
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-primary::after {
+  border: none;
+}

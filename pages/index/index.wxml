@@ -1,0 +1,93 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <!-- 头部问候区域 -->
+  <view class="header">
+    <view class="greeting">
+      <text class="title">👋 {{welcomeText}}</text>
+      <text class="subtitle">准备好今天的学习了吗？</text>
+    </view>
+  </view>
+
+  <!-- 统计数据卡片 -->
+  <view class="stats-cards">
+    <view class="stat-card" bindtap="startReview">
+      <view class="stat-icon">📚</view>
+      <view class="stat-info">
+        <text class="stat-value">{{reviewCount}}</text>
+        <text class="stat-label">今日待复习</text>
+      </view>
+    </view>
+    
+    <view class="stat-card" bindtap="startLearning">
+      <view class="stat-icon">✨</view>
+      <view class="stat-info">
+        <text class="stat-value">{{learnedCount}}</text>
+        <text class="stat-label">已学习</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日推荐单词 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🔥 今日推荐</text>
+      <text class="section-more">查看更多 →</text>
+    </view>
+    
+    <view class="word-list">
+      <view class="word-item" wx:for="{{todayWords}}" wx:key="id">
+        <view class="word-content">
+          <text class="word-en">{{item.word}}</text>
+          <text class="word-cn">{{item.meaning}}</text>
+        </view>
+        <button class="btn-quick-review" size="small" bindtap="quickReview" data-word="{{item}}">
+          快速复习
+        </button>
+      </view>
+      
+      <view class="empty-tip" wx:if="{{todayWords.length === 0}}">
+        <text class="tip-icon">📭</text>
+        <text class="tip-text">还没有推荐单词，先添加一些吧！</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷功能入口 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">⚡ 快速开始</text>
+    </view>
+    
+    <view class="quick-actions">
+      <view class="action-item" bindtap="startFlashCard">
+        <view class="action-icon">🃏</view>
+        <text class="action-label">闪卡学习</text>
+      </view>
+      
+      <view class="action-item" bindtap="startDictation">
+        <view class="action-icon">✍️</view>
+        <text class="action-label">听写测试</text>
+      </view>
+      
+      <view class="action-item" bindtap="openWordsList">
+        <view class="action-icon">📖</view>
+        <text class="action-label">单词本</text>
+      </view>
+      
+      <view class="action-item" bindtap="openWordSets">
+        <view class="action-icon">📚</view>
+        <text class="action-label">单词集</text>
+      </view>
+      
+      <view class="action-item" bindtap="openPlan">
+        <view class="action-icon">📅</view>
+        <text class="action-label">每日计划</text>
+      </view>
+      
+      <view class="action-item" bindtap="openGoals">
+        <view class="action-icon">🎯</view>
+        <text class="action-label">学习目标</text>
+      </view>
+    </view>
+  </view>
+</view>

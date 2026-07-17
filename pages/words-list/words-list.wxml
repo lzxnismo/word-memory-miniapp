@@ -1,0 +1,115 @@
+<!-- pages/words-list/words-list.wxml -->
+<view class="container">
+  <!-- 顶部搜索栏 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索单词..."
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+    </view>
+    
+    <!-- 分类筛选 -->
+    <view class="filter-bar">
+      <button 
+        class="filter-btn {{filterCategory === 'all' ? 'active' : ''}}"
+        bindtap="setFilter"
+        data-filter="all"
+      >
+        全部
+      </button>
+      <button 
+        class="filter-btn {{filterCategory === 'mastered' ? 'active' : ''}}"
+        bindtap="setFilter"
+        data-filter="mastered"
+      >
+        已掌握
+      </button>
+      <button 
+        class="filter-btn {{filterCategory === 'reviewing' ? 'active' : ''}}"
+        bindtap="setFilter"
+        data-filter="reviewing"
+      >
+        学习中
+      </button>
+      <button 
+        class="filter-btn {{filterCategory === 'new' ? 'active' : ''}}"
+        bindtap="setFilter"
+        data-filter="new"
+      >
+        未学习
+      </button>
+    </view>
+  </view>
+
+  <!-- 统计数据 -->
+  <view class="stats-section">
+    <view class="stat-item">
+      <text class="stat-value">{{totalWords}}</text>
+      <text class="stat-label">总单词数</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{learnedCount}}</text>
+      <text class="stat-label">已学习</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{masteredCount}}</text>
+      <text class="stat-label">已掌握</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{accuracy}}%</text>
+      <text class="stat-label">正确率</text>
+    </view>
+  </view>
+
+  <!-- 单词列表 -->
+  <scroll-view 
+    class="word-list"
+    scroll-y
+    enable-flex
+  >
+    <view wx:for="{{filteredWords}}" wx:key="id" class="word-item">
+      <view class="word-content" bindtap="goToDetail" data-id="{{item.id}}">
+        <view class="word-main">
+          <text class="word-en">{{item.word}}</text>
+          <text class="word-phonetic">{{item.phonetic}}</text>
+        </view>
+        
+        <view class="word-meaning">{{item.meaning}}</view>
+        
+        <view class="word-status" wx:if="{{item.status === 'mastered'}}">
+          ✅ 已掌握
+        </view>
+        <view class="word-status reviewing" wx:elif="{{item.status === 'learning'}}">
+          📈 学习中
+        </view>
+        <view class="word-status new" wx:else>
+          ⏳ 待学习
+        </view>
+      </view>
+      
+      <view class="word-actions">
+        <button class="btn-audio" bindtap="playWordAudio" data-word="{{item.word}}">
+          🔊
+        </button>
+        <button class="btn-detail" bindtap="goToDetail" data-id="{{item.id}}">
+          详情 →
+        </button>
+      </view>
+    </view>
+    
+    <view class="empty-tip" wx:if="{{filteredWords.length === 0}}">
+      <text class="empty-icon">📭</text>
+      <text class="empty-text">没有找到单词</text>
+    </view>
+    
+    <view class="loading-more" wx:if="{{loadingMore}}">
+      <text class="loading-spinner">⏳</text>
+      <text>加载中...</text>
+    </view>
+  </scroll-view>
+</view>

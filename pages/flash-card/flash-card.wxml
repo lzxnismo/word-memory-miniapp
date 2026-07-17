@@ -1,0 +1,98 @@
+<!-- pages/flash-card/flash-card.wxml -->
+<view class="container">
+  <!-- 进度条 -->
+  <view class="progress-header">
+    <view class="progress-info">
+      <text>{{currentIndex + 1}}/{{queue.length}}</text>
+    </view>
+    <slider 
+      value="{{currentIndex / queue.length}}" 
+      show-value 
+      block-size="16"
+      activeColor="#667eea"
+      backgroundColor="#e0e0e0"
+      bindchange="onSliderChange"
+    />
+  </view>
+
+  <!-- 单词卡片区域 -->
+  <view class="card-area" bindtap="flipCard">
+    <view class="flash-card {{isFlipped ? 'flipped' : ''}}">
+      <!-- 正面：英文 -->
+      <view class="card-front">
+        <text class="word-en">{{currentWord.word}}</text>
+        <text class="word-phonetic">{{currentWord.phonetic}}</text>
+        
+        <!-- 发音按钮 -->
+        <view class="audio-control" bindtap="playTts" hidden="{{!showAudioButton}}">
+          <text class="audio-icon">🔊</text>
+        </view>
+      </view>
+      
+      <!-- 背面：中文释义和例句 -->
+      <view class="card-back">
+        <view class="meaning-section">
+          <text class="word-meaning">{{currentWord.meaning}}</text>
+        </view>
+        
+        <view class="example-section" wx:if="{{currentWord.example_en}}">
+          <text class="example-label">例句：</text>
+          <text class="example-en">{{currentWord.example_en}}</text>
+          <text class="example-cn">{{currentWord.example_cn}}</text>
+        </view>
+        
+        <!-- 翻回提示 -->
+        <view class="flip-hint" wx:if="{{isFlipped}}">
+          <text>点击卡片翻回</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 质量评分按钮组 -->
+  <view class="rating-area" wx:if="{{isFlipped}}">
+    <view class="rating-buttons">
+      <button 
+        class="btn-rate btn-rate-wrong" 
+        data-quality="1"
+        bindtap="rateWord"
+      >
+        ❌ 不认识
+      </button>
+      <button 
+        class="btn-rate btn-rate-fuzzy" 
+        data-quality="2"
+        bindtap="rateWord"
+      >
+        ⚠️ 模糊
+      </button>
+      <button 
+        class="btn-rate btn-rate-known" 
+        data-quality="4"
+        bindtap="rateWord"
+      >
+        ✅ 认识
+      </button>
+    </view>
+    
+    <!-- 跳过按钮 -->
+    <button class="btn-skip" bindtap="skipWord">⏭️ 稍后复习</button>
+  </view>
+
+  <!-- 学习完成页面 -->
+  <view class="completion-screen" wx:if="{{learningComplete}}">
+    <view class="completion-icon">🎉</view>
+    <text class="completion-title">本期学习完成！</text>
+    <text class="completion-stats">{{completedCount}}/{{totalWords}} 已掌握</text>
+    
+    <view class="completion-actions">
+      <button class="btn-primary" bindtap="continueReview">继续复习</button>
+      <button class="btn-secondary" bindtap="goHome">返回首页</button>
+    </view>
+  </view>
+
+  <!-- 加载中状态 -->
+  <view class="loading-screen" wx:if="{{loading}}">
+    <text class="loading-text">正在加载单词...</text>
+  </view>
+</view>

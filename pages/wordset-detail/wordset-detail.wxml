@@ -1,0 +1,73 @@
+<!-- pages/wordset-detail/wordset-detail.wxml -->
+<view class="container">
+  <!-- 头部信息 -->
+  <view class="set-header">
+    <view class="set-color-bar" style="background-color: {{setInfo.color || '#667eea'}}"></view>
+    <text class="set-name">{{setInfo.name}}</text>
+    <text class="set-desc" wx:if="{{setInfo.description}}">{{setInfo.description}}</text>
+    <view class="set-stats">
+      <text class="stat-item">📝 {{setInfo.word_count}} 词</text>
+      <text class="stat-item">🎯 {{setInfo.retention_rate}}% 掌握</text>
+      <text class="stat-item">📈 {{setInfo.learning_rate}}% 已学</text>
+    </view>
+  </view>
+
+  <!-- 操作栏 -->
+  <view class="action-bar">
+    <button class="btn-action" bindtap="addWords">+ 添加单词</button>
+    <button class="btn-action" bindtap="startLearning">🃏 开始学习</button>
+    <button class="btn-action btn-delete" bindtap="deleteSet">🗑 删除</button>
+  </view>
+
+  <!-- 单词列表 -->
+  <view class="words-list">
+    <view class="word-item" wx:for="{{words}}" wx:key="word_id" bindtap="openWord" data-id="{{item.word_id}}">
+      <view class="word-main">
+        <text class="word-en">{{item.word}}</text>
+        <text class="word-phonetic" wx:if="{{item.phonetic}}">{{item.phonetic}}</text>
+      </view>
+      <text class="word-cn">{{item.meaning}}</text>
+      <view class="word-meta">
+        <text class="meta-item">🎯 {{item.mastery_score}}</text>
+        <text class="meta-item">🔥 {{item.streak}}</text>
+        <text class="meta-item">📝 {{item.total_reviews}}</text>
+      </view>
+      <view class="word-suggestion" wx:if="{{item.suggestion}}">
+        <text>💡 {{item.suggestion}}</text>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{words.length === 0}}">
+      <text class="tip-icon">📭</text>
+      <text class="tip-text">该单词集还没有单词，点击上方按钮添加吧！</text>
+    </view>
+  </view>
+
+  <!-- 添加单词对话框 -->
+  <view class="dialog-mask" wx:if="{{showAdd}}">
+    <view class="dialog">
+      <text class="dialog-title">添加单词</text>
+      <view class="search-bar">
+        <input class="search-input" placeholder="输入英文单词..." value="{{searchWord}}" bindinput="onSearchInput" />
+        <button class="btn-search" bindtap="searchWord">查找</button>
+      </view>
+      
+      <!-- 搜索结果 -->
+      <view class="search-result" wx:if="{{lookupResult}}">
+        <view wx:if="{{lookupResult.found}}">
+          <text class="result-word">{{lookupResult.word}}</text>
+          <text class="result-phonetic" wx:if="{{lookupResult.phonetic}}">{{lookupResult.phonetic}}</text>
+          <text class="result-meaning">{{lookupResult.meaning}}</text>
+          <button class="btn-add" bindtap="confirmAddWord">确认添加</button>
+        </view>
+        <view wx:else>
+          <text class="not-found">未找到该单词，请检查拼写</text>
+        </view>
+      </view>
+      
+      <view class="dialog-actions">
+        <button class="btn-cancel" bindtap="hideAddDialog">关闭</button>
+      </view>
+    </view>
+  </view>
+</view>

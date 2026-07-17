@@ -1,0 +1,10 @@
+{
+  "name": "goal_manager",
+  "version": "1.0.0",
+  "description": "学习目标管理云函数 - 直连 MySQL",
+  "main": "index.js",
+  "dependencies": {
+    "mysql2": "^3.9.0",
+    "wx-server-sdk": "~2.6.3"
+  }
+}

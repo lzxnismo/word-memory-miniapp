@@ -1,0 +1,139 @@
+/* pages/word-detail/word-detail-extra.wxss */
+/* 在线查词补全样式 */
+.lookup-section {
+  margin-bottom: 30rpx;
+}
+
+.btn-lookup {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  border: none;
+  transition: transform 0.2s;
+}
+
+.btn-lookup::after {
+  border: none;
+}
+
+.lookup-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.lookup-text {
+  font-weight: bold;
+}
+
+.lookup-loading {
+  text-align: center;
+  padding: 20rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.lookup-result {
+  margin-top: 20rpx;
+  padding: 24rpx;
+  background: #f8f9fa;
+  border-radius: 16rpx;
+  border: 1rpx solid #e0e0e0;
+}
+
+.lookup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+.lookup-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.lookup-close {
+  font-size: 36rpx;
+  color: #999;
+  background: none;
+  border: none;
+  padding: 4rpx 12rpx;
+}
+
+.lookup-close::after {
+  border: none;
+}
+
+.lookup-phonetic {
+  font-size: 24rpx;
+  color: #667eea;
+  margin-bottom: 16rpx;
+}
+
+.lookup-defs {
+  margin-bottom: 20rpx;
+}
+
+.lookup-pos {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+  margin-top: 16rpx;
+  margin-bottom: 8rpx;
+}
+
+.lookup-def {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-left: 12rpx;
+}
+
+.lookup-examples {
+  margin-bottom: 20rpx;
+}
+
+.lookup-example {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  background: #fff;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.lookup-synonyms {
+  margin-top: 16rpx;
+}
+
+.lookup-label {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.lookup-tag {
+  font-size: 22rpx;
+  color: #667eea;
+  background: #e6f0ff;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  margin-right: 12rpx;
+  margin-bottom: 8rpx;
+  display: inline-block;
+}

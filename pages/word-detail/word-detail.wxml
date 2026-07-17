@@ -1,0 +1,100 @@
+<!-- pages/word-detail/word-detail.wxml -->
+<view class="container">
+  <!-- 加载中状态 -->
+  <view class="loading-screen" wx:if="{{loading}}">
+    <text class="loading-text">正在加载详情...</text>
+  </view>
+
+  <!-- 单词详情内容 -->
+  <view class="detail-content" wx:if="{{!loading && wordData}}">
+    <!-- 发音按钮 -->
+    <view class="audio-control-area" bindtap="playAudio">
+      <button class="btn-audio-large" hover-class="btn-audio-hover">
+        <text class="audio-icon">🔊</text>
+        <text class="audio-text">播放发音</text>
+      </button>
+    </view>
+
+    <!-- 单词卡片区域 -->
+    <view class="word-card">
+      <text class="word-en">{{wordData.word}}</text>
+      <text class="word-phonetic">{{wordData.phonetic}}</text>
+      
+      <view class="word-meaning-section">
+        <text class="word-meaning">{{wordData.meaning}}</text>
+      </view>
+      
+      <view class="example-section" wx:if="{{wordData.example_en}}">
+        <text class="example-title">例句：</text>
+        <text class="example-en">{{wordData.example_en}}</text>
+        <text class="example-cn">{{wordData.example_cn}}</text>
+      </view>
+    </view>
+
+    <!-- 学习操作区 -->
+    <view class="action-area">
+      <!-- 在线查词补全 -->
+      <view class="lookup-section" wx:if="{{!lookupLoading}}">
+        <button class="btn-lookup" wx:if="{{!lookupResult}}" bindtap="doLookup">
+          <text class="lookup-icon">🔍</text>
+          <text class="lookup-text">在线查词补充</text>
+        </button>
+        <view class="lookup-result" wx:if="{{lookupResult}}">
+          <view class="lookup-header">
+            <text class="lookup-title">📖 词典详情</text>
+            <text class="lookup-close" bindtap="clearLookup">✕</text>
+          </view>
+          <view class="lookup-phonetic" wx:if="{{lookupResult.phonetic_us}}">
+            <text>美式音标：{{lookupResult.phonetic_us}}</text>
+          </view>
+          <view class="lookup-phonetic" wx:if="{{lookupResult.phonetic_uk}}">
+            <text>英式音标：{{lookupResult.phonetic_uk}}</text>
+          </view>
+          <view class="lookup-defs" wx:for="{{lookupResult.definitions}}" wx:key="pos">
+            <text class="lookup-pos">{{item.pos}}</text>
+            <text class="lookup-def">{{item.definition}}</text>
+          </view>
+          <view class="lookup-examples" wx:if="{{lookupResult.examples}}">
+            <text class="lookup-example" wx:for="{{lookupResult.examples}}" wx:key="*this">
+              💬 {{item}}
+            </text>
+          </view>
+          <view class="lookup-synonyms" wx:if="{{lookupResult.synonyms && lookupResult.synonyms.length > 0}}">
+            <text class="lookup-label">同义词：</text>
+            <text class="lookup-tag" wx:for="{{lookupResult.synonyms}}" wx:key="*this">{{item}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="lookup-loading" wx:if="{{lookupLoading}}">
+        <text class="loading-text">正在查询...</text>
+      </view>
+
+      <view class="learning-status" wx:if="{{isLearned}}">
+        <text class="status-label">当前状态：</text>
+        <text class="status-value {{wordMemory.status}}">{{statusText}}</text>
+        
+        <view class="memory-info" wx:if="{{wordMemory.nextReviewTime}}">
+          <text>下次复习：{{formatDate(wordMemory.nextReviewTime)}}</text>
+        </view>
+      </view>
+
+      <view class="rating-buttons" wx:if="{{!isLearned || isDue}}">
+        <button class="btn-rate btn-wrong" bindtap="markWrong">❌ 不认识</button>
+        <button class="btn-rate btn-fuzzy" bindtap="markFuzzy">⚠️ 模糊记忆</button>
+        <button class="btn-rate btn-known" bindtap="markKnown">✅ 认识</button>
+      </view>
+
+      <view class="action-buttons">
+        <button class="btn-primary" bindtap="goToFlashCard">进入闪卡学习</button>
+        <button class="btn-secondary" bindtap="goBack">返回列表</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error-screen" wx:if="{{!loading && !wordData}}">
+    <text class="error-icon">😕</text>
+    <text class="error-text">未找到该单词，请返回首页重新选择</text>
+    <button class="btn-home" bindtap="goHome">返回首页</button>
+  </view>
+</view>
