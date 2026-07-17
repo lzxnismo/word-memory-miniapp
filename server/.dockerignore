@@ -1,0 +1,13 @@
+# 排除不需要的文件
+node_modules/
+npm-debug.log
+.git/
+.github/
+docs/
+scripts/
+tests/
+*.md
+*.test.js
+.env
+.env.local
+.env.*.local

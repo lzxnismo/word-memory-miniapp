@@ -1,0 +1,21 @@
+{
+  "name": "word-memory-miniapp-server",
+  "version": "2.0.0",
+  "description": "单词记忆系统 - 微信云托管版（Docker）",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "test": "node --test tests/",
+    "health": "curl http://localhost:3000/health"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "mysql2": "^3.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "一帮人马工作室（QQ691481548）",
+  "license": "MIT"
+}
