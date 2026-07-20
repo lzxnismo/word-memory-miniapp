@@ -175,7 +175,7 @@ router.get('/recommend', async (req, res) => {
     const [rows] = await db.execute(`
       SELECT w.id, w.word, w.phonetic, w.meaning, w.part_of_speech,
              w.example_en, w.example_cn, w.grade, w.unit, w.tags,
-             u.ease_factor, u.interval, u.ladder, u.next_review, u.mastery_score
+             u.ease_factor, u.interval, u.memory_level, u.next_review, u.mastery_score
       FROM user_word_memories u
       JOIN words w ON u.word_id = w.id
       WHERE u.user_id = ? 
