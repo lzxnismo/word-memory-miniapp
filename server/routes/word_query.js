@@ -117,8 +117,8 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-// GET /?limit=50&offset=0&grade=7&book=xxx
-router.get('/', async (req, res) => {
+// POST /?limit=50&offset=0&grade=7&book=xxx - 获取单词列表（支持分页和筛选）
+router.post('/', async (req, res) => {
   try {
     const { limit = 50, offset = 0, grade, book } = req.query
     let sql = `SELECT w.id, w.word, w.phonetic, w.meaning, w.part_of_speech,
