@@ -165,4 +165,32 @@ router.get('/', async (req, res) => {
   }
 })
 
+// GET /recommend?limit=5 — 智能推荐今日学习单词（基于 SM-2 算法）
+router.get('/recommend', async (req, res) => {
+  try {
+    const { limit = 5 } = req.query
+    const db = getPool()
+    
+    // 优先推荐新学但未掌握且临近复习的单词
+    const [rows] = await db.execute(`
+      SELECT w.id, w.word, w.phonetic, w.meaning, w.part_of_speech,
+             w.example_en, w.example_cn, w.grade, w.unit, w.tags,
+             u.ease_factor, u.interval, u.ladder, u.next_review, u.mastery_score
+      FROM user_word_memories u
+      JOIN words w ON u.word_id = w.id
+      WHERE u.user_id = ? 
+        AND u.review_status = 'active'
+        AND u.last_review <= NOW()
+        AND (u.next_review > NOW() OR u.interval = 0)
+      ORDER BY u.next_review ASC, u.mastery_score ASC
+      LIMIT ?
+    `, [req.openid, parseInt(limit)])
+    
+    res.json({ code: 200, data: rows })
+  } catch (err) {
+    console.error('❌ word_query recommend:', err)
+    res.status(500).json({ code: 500, msg: '服务器内部错误', error: err.message })
+  }
+})
+
 module.exports = router

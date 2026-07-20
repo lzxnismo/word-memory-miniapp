@@ -12,7 +12,7 @@ const BASE_URL = 'https://express-yoq0-283362-9-1453336058.sh.run.tcloudbase.com
 // 全局配置
 const CONFIG = {
   timeout: 15000,     // 超时时间 15s
-  debug: false        // 是否开启调试日志
+  debug: true         // 开启调试日志 ✨
 }
 
 /**
@@ -56,7 +56,7 @@ async function request(url, options = {}) {
   const { method = 'POST', data = {}, auth = true } = options
   
   // 构建完整 URL
-  const fullUrl = `${BASE_URL}${url.startsWith('/') ? '' : '/' + url}`
+  const fullUrl = `${BASE_URL}${url.startsWith('/') ? url : '/' + url}`
   
   // 准备请求头
   const headers = {

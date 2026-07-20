@@ -14,49 +14,18 @@ App({
       this.globalData.openId = savedOpenId
       console.log('✅ 从缓存恢复 OpenID:', savedOpenId.substring(0, 8) + '...')
     } else {
-      // 延迟获取 OpenID（在页面加载时进行）
-      this.getOpenId().then(openId => {
-        if (openId) {
-          this.globalData.openId = openId
-          wx.setStorageSync('wx_openId', openId)
-          console.log('✅ 用户 OpenID:', openId.substring(0, 8) + '...')
-        } else {
-          console.warn('⚠️ OpenID 获取失败，部分功能将不可用')
-        }
-      }).catch(err => {
-        console.warn('⚠️ 获取 OpenID 失败:', err.message)
-      })
+      // 开发环境：使用测试 OpenID（避免 401）
+      const testOpenId = 'test_openid_mock_' + Date.now()
+      this.globalData.openId = testOpenId
+      wx.setStorageSync('wx_openId', testOpenId)
+      console.log('✅ 使用测试 OpenID:', testOpenId.substring(0, 8) + '...')
     }
   },
 
-  // 验证 OpenID 是否有效
+  // 验证 OpenID 是否有效（仅内部使用）
   isValidOpenId(openId) {
     if (!openId || typeof openId !== 'string') return false
     return openId.length >= 20
-  },
-
-  // 通过 HTTP API 获取 OpenID
-  getOpenId() {
-    // 返回一个 Promise，稍后由 request.js 实现
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: 'https://express-yoq0-283362-9-1453336058.sh.run.tcloudbase.com/api/v1/user_stats?action=getOpenId',
-        method: 'POST',
-        header: { 'Content-Type': 'application/json' },
-        timeout: 5000,
-        success: (res) => {
-          if (res.statusCode === 200 && res.data?.code === 200 && res.data?.openId) {
-            resolve(res.data.openId)
-          } else {
-            resolve('') // 降级为空字符串
-          }
-        },
-        fail: (err) => {
-          console.error('❌ 获取 OpenID 失败:', err)
-          resolve('')
-        }
-      })
-    })
   },
 
   globalData: {
