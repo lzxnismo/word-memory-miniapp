@@ -113,7 +113,7 @@ Page({
     wx.showLoading({ title: '提交中...' })
     
     try {
-      const res = await requestLib.request('/record', {
+      const res = await requestLib.request('/record_review/record', {
         method: 'POST',
         data: {
           wordId: this.data.wordData.id,

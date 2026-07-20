@@ -194,7 +194,7 @@ Page({
     }
     
     try {
-      await requestLib.request('/record', {
+      await requestLib.request('/record_review/record', {
         method: 'POST',
         data: reviewData
       })
