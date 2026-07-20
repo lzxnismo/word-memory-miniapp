@@ -41,8 +41,8 @@ router.get('/sync', async (req, res) => {
 
         if (existing.length === 0) {
           await conn.execute(
-            'INSERT INTO categories (name, description, word_count, owner_openid, created_at) VALUES (?, ?, 0, NULL, NOW())',
-            [name, `${name}英语词汇`]
+            'INSERT INTO categories (name, owner_openid, created_at) VALUES (?, NULL, NOW())',
+            [name]
           )
         }
       }

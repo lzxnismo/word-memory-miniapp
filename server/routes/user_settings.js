@@ -16,30 +16,40 @@ const { authMiddleware } = require('../shared/auth')
 router.use(authMiddleware)
 
 // ==================== GET /user_settings ====================
-// 获取用户设置和基础统计
+// 获取用户设置和基础统计（从 settings K-V 表）
 router.get('/', async (req, res) => {
   try {
     const openid = req.openid
     const db = getPool()
 
-    // 1. 查询用户设置（从 settings 表）
+    // 1. 查询用户设置（从 settings 表，K-V 结构）
     let [settingsRows] = await db.execute(
-      'SELECT daily_limit, new_word_ratio FROM user_settings WHERE user_id = ?',
+      'SELECT setting_key, setting_value FROM settings WHERE user_id = ?',
       [openid]
     )
 
-    // 2. 如果没有设置记录，使用默认值
-    let dailyLimit = 20
-    let newWordRatio = 0.3
+    // 2. 解析 K-V 为对象
+    const settingsMap = {}
     if (settingsRows && settingsRows.length > 0) {
-      dailyLimit = settingsRows[0].daily_limit || 20
-      newWordRatio = settingsRows[0].new_word_ratio || 0.3
-    } else {
-      // 创建默认设置记录
+      settingsRows.forEach(row => {
+        settingsMap[row.setting_key] = row.setting_value
+      })
+    }
+
+    // 3. 如果没有设置记录，使用默认值
+    let dailyLimit = parseInt(settingsMap.daily_limit) || 20
+    let newWordRatio = parseFloat(settingsMap.new_word_ratio) || 0.3
+
+    // 4. 如果没有记录，创建默认设置
+    if (settingsRows.length === 0) {
       try {
         await db.execute(
-          'INSERT INTO user_settings (user_id, daily_limit, new_word_ratio) VALUES (?, ?, ?)',
-          [openid, dailyLimit, newWordRatio]
+          'INSERT INTO settings (user_id, setting_key, setting_value) VALUES (?, ?, ?)',
+          [openid, 'daily_limit', String(dailyLimit)]
+        )
+        await db.execute(
+          'INSERT INTO settings (user_id, setting_key, setting_value) VALUES (?, ?, ?)',
+          [openid, 'new_word_ratio', String(newWordRatio)]
         )
       } catch (err) {
         console.warn('创建默认设置失败:', err.message)
@@ -79,7 +89,7 @@ router.get('/', async (req, res) => {
 })
 
 // ==================== PUT /user_settings ====================
-// 更新用户设置
+// 更新用户设置（写入 settings K-V 表）
 router.put('/', async (req, res) => {
   try {
     const openid = req.openid
@@ -91,16 +101,20 @@ router.put('/', async (req, res) => {
 
     const db = getPool()
 
-    // 更新或插入设置
-    const [result] = await db.execute(`
-      INSERT INTO user_settings (user_id, daily_limit, new_word_ratio)
-      VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-        daily_limit = ?,
-        new_word_ratio = ?
-    `, [
-      openid, safeDailyLimit, safeNewWordRatio,
-      safeDailyLimit, safeNewWordRatio
+    // 更新或插入设置（K-V 模式）
+    const insertUpdateSettings = async (key, value) => {
+      const [result] = await db.execute(`
+        INSERT INTO settings (user_id, setting_key, setting_value)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          setting_value = ?
+      `, [openid, key, String(value), String(value)])
+      return result
+    }
+
+    await Promise.all([
+      insertUpdateSettings('daily_limit', safeDailyLimit),
+      insertUpdateSettings('new_word_ratio', safeNewWordRatio)
     ])
 
     res.json({

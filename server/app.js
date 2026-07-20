@@ -92,6 +92,10 @@ app.use('/api/v1/category_management', categoryManagementRouter)
 const userSettingsRouter = require('./routes/user_settings')
 app.use('/api/v1/user_settings', userSettingsRouter)
 
+// Debug routes (development only)
+const debugRouter = require('./routes/debug')
+app.use('/api/v1/debug', debugRouter)
+
 // ==================== 错误处理 ====================
 
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
