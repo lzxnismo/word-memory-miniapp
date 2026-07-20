@@ -4,7 +4,7 @@ const app = getApp()
 /**
  * 检查用户是否已授权（拥有有效的 OpenID）
  */
-export function checkAuth() {
+function checkAuth() {
   const openId = app.globalData.openId
   
   // 如果已有有效的 OpenID，说明已授权
@@ -19,7 +19,7 @@ export function checkAuth() {
 /**
  * 需要授权后才能使用的功能提示
  */
-export function showAuthRequiredTip() {
+function showAuthRequiredTip() {
   wx.showModal({
     title: '⚠️ 需要授权',
     content: '为了保存您的学习进度和复习记录，请先完成授权\n\n稍后您可以从【设置】中完成授权',
@@ -41,7 +41,7 @@ export function showAuthRequiredTip() {
  * @param {Function} onSuccess - 获取成功回调
  * @param {Function} onError - 获取失败回调
  */
-export function tryGetOpenId(onSuccess, onError) {
+function tryGetOpenId(onSuccess, onError) {
   const savedOpenId = wx.getStorageSync('wx_openId')
   
   if (savedOpenId && app.isValidOpenId(savedOpenId)) {
@@ -71,3 +71,5 @@ export function tryGetOpenId(onSuccess, onError) {
   
   return false
 }
+
+module.exports = { checkAuth, showAuthRequiredTip, tryGetOpenId }

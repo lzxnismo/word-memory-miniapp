@@ -1,40 +1,40 @@
 /**
- * shared/db.js — 统一数据库连接池
- * 
- * 在云托管环境中，所有数据库配置通过环境变量传入
- * 避免密码硬编码到代码中
- * 
- * © 一帮人马工作室（QQ691481548）
- */
+ /**
+  * shared/db.js — 统一数据库连接池
+  * 
+  * 微信云托管环境专用
+  * 数据库配置通过环境变量传入
+  * 
+  * © 一帮人马工作室（QQ691481548）
+  */
+ const mysql = require('mysql2/promise')
 
-const mysql = require('mysql2/promise')
+ let pool = null
 
-let pool = null
+ /**
+  * 获取数据库连接池（单例模式）
+  * 配置优先级：环境变量 > 默认值
+  */
+ function getPool() {
+   if (!pool) {
+     const config = {
+       host: process.env.DATABASE_HOST || '10.40.109.26',      // 微信云内网 MySQL
+       port: parseInt(process.env.DATABASE_PORT || '3306'),     // 微信云 MySQL 端口
+       user: process.env.DATABASE_USER || 'word_memory_app',
+       password: process.env.DATABASE_PASSWORD || 'Root_123',
+       database: process.env.DATABASE_NAME || 'word_memory_db', // 微信云数据库名
+       waitForConnections: true,
+       connectionLimit: 20,
+       queueLimit: 0,
+       connectTimeout: 10000,
+       timezone: '+08:00'
+     }
 
-/**
- * 获取数据库连接池（单例模式）
- * 配置优先级：环境变量 > 默认值
- */
-function getPool() {
-  if (!pool) {
-    const config = {
-      host: process.env.DATABASE_HOST || 'sh-cynosdbmysql-grp-80l7mu8u.sql.tencentcdb.com',
-      port: parseInt(process.env.DATABASE_PORT || '27780'),
-      user: process.env.DATABASE_USER || 'word_memory_app',
-      password: process.env.DATABASE_PASSWORD || 'Root_123',
-      database: process.env.DATABASE_NAME || 'mytx-d7gw0vhq4414988b5',
-      waitForConnections: true,
-      connectionLimit: 20,
-      queueLimit: 0,
-      connectTimeout: 10000,
-      timezone: '+08:00'
-    }
-
-    pool = mysql.createPool(config)
-    console.log(`✅ 数据库连接池建立 [${config.database}@${config.host}:${config.port}]`)
-  }
-  return pool
-}
+     pool = mysql.createPool(config)
+     console.log(`✅ 数据库连接池建立 [${config.database}@${config.host}:${config.port}]`)
+   }
+   return pool
+ }
 
 /**
  * 获取连接（带自动释放）

@@ -1,4 +1,6 @@
-// pages/wordset-list/wordset-list.js
+// pages/wordset-list/wordset-list.js - 微信云托管版
+const requestLib = require('../../utils/request')
+
 Page({
   data: {
     sets: [],
@@ -6,7 +8,7 @@ Page({
     newName: '',
     newDesc: '',
     newColor: '#667eea',
-    colors: ['#667eea', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#3498db']
+    colors: ['#667eea', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e02', '#3498db']
   },
 
   onShow() {
@@ -17,14 +19,9 @@ Page({
   async loadSets() {
     wx.showLoading({ title: '加载中...' })
     try {
-      const res = await wx.cloud.callContainer({
-        path: '/api/v1/word_sets',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { action: 'list' }
-      })
-      if (res.statusCode === 200 && res.data && res.data.code === 200) {
-        this.setData({ sets: res.data.data })
+      const res = await requestLib.request('/word_sets')
+      if (res && res.data) {
+        this.setData({ sets: res.data })
       }
     } catch (err) {
       console.error('加载失败:', err)
@@ -71,23 +68,21 @@ Page({
 
     wx.showLoading({ title: '创建中...' })
     try {
-      const res = await wx.cloud.callContainer({
-        path: '/api/v1/word_sets',
+      const res = await requestLib.request('/word_sets', {
         method: 'POST',
-        header: { 'content-type': 'application/json' },
         data: {
-          action: 'create',
           name: newName.trim(),
           description: newDesc.trim() || undefined,
           color: newColor
         }
       })
-      if (res.statusCode === 200 && res.data && res.data.code === 201) {
+      
+      if (res && res.code === 201) {
         wx.showToast({ title: '创建成功', icon: 'success' })
         this.hideCreateDialog()
         this.loadSets()
       } else {
-        wx.showToast({ title: res.result.message || '创建失败', icon: 'none' })
+        wx.showToast({ title: res.message || '创建失败', icon: 'none' })
       }
     } catch (err) {
       wx.showToast({ title: '创建失败', icon: 'none' })

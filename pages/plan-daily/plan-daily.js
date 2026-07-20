@@ -1,20 +1,16 @@
-// pages/plan-daily/plan-daily.js
+// pages/plan-daily/plan-daily.js - 微信云托管版
+const requestLib = require('../../utils/request')
+
 Page({
   data: {
-    dailyLimit: 50,       // 每日学习上限
-    newWordRatio: '1:3',   // 新词与复习比例
-    currentLimitIndex: 2,  // 默认 50
+    dailyLimit: 50,
+    newWordRatio: '1:3',
+    currentLimitIndex: 2,
     currentRatioIndex: 1,
-    
-    // 今日进度
-    reviewCount: 0,      // 待复习数
-    learnedToday: 0,     // 今日已学新词
-    dailyProgress: 0,    // 今日总进度（复习 + 新学）
-    remainingNew: 0,     // 剩余可学新词
-    
-    // 任务列表
-    completedTasks: [],
-    activeTasks: []
+    reviewCount: 0,
+    learnedToday: 0,
+    dailyProgress: 0,
+    remainingNew: 0
   },
 
   limitOptions: ['10', '30', '50', '100'],
@@ -29,60 +25,41 @@ Page({
   },
 
   async loadData() {
-    const app = getApp()
-    const openId = app.globalData.openId || 'mock_'
-    
     try {
-      // 加载用户设置
-      const settingsRes = await wx.cloud.callContainer({
-        path: '/api/v1/word_query',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { 
-          action: 'getUserSettings',
-          userId: openId
-        }
-      })
+      const settingsRes = await requestLib.request('/user_settings', { method: 'GET' })
       
-      if (settingsRes.statusCode === 200 && settingsRes.data && settingsRes.data.code === 200 && settingsRes.data.settings) {
-        const settings = settingsRes.data.settings
+      if (settingsRes && settingsRes.code === 200 && settingsRes.data) {
+        const settings = settingsRes.data
         this.setData({
           dailyLimit: Number(settings.dailyLimit) || 50,
           newWordRatio: settings.newWordRatio || '1:3'
         })
         
-        // 计算当前选中索引
         const limitIndex = this.limitOptions.indexOf(String(settings.dailyLimit))
-        const ratioIndex = this.ratioOptions.indexOf(settings.newWordRatio)
+        const ratioIndex = this.ratioOptions.findIndex(opt => opt.startsWith(settings.newWordRatio?.split(' ')[0]))
         this.setData({
           currentLimitIndex: limitIndex >= 0 ? limitIndex : 2,
           currentRatioIndex: ratioIndex >= 0 ? ratioIndex : 1
         })
       }
       
-      // 加载统计数据
-      const statsRes = await wx.cloud.callContainer({
-        path: '/api/v1/user_stats',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { action: 'overview' }
-      })
+      const statsRes = await requestLib.request('/user_stats/overview', { method: 'GET' })
       
-      if (statsRes.statusCode === 200 && statsRes.data && statsRes.data.code === 200) {
-        const stats = statsRes.data.data
+      if (statsRes && statsRes.code === 200 && statsRes.data) {
+        const stats = statsRes.data
         
         this.setData({
           reviewCount: stats.pending_review || 0,
-          learnedToday: stats.total_learned || 0,
-          dailyProgress: Math.min(stats.total_learned + (stats.pending_review || 0), this.data.dailyLimit)
+          learnedToday: stats.total_learned_new || 0
         })
         
-        // 计算剩余可学新词
         const maxLearned = this.data.dailyLimit
-        const remaining = Math.max(0, maxLearned - stats.total_learned)
+        const remaining = Math.max(0, maxLearned - (stats.total_learned_new || 0))
+        const totalProgress = Math.min((stats.total_learned_new || 0) + (stats.pending_review || 0), maxLearned)
+        
         this.setData({ 
           remainingNew: remaining,
-          dailyProgress: Math.min(stats.total_learned + (stats.pending_review || 0), maxLearned)
+          dailyProgress: totalProgress
         })
       }
     } catch (err) {
@@ -94,27 +71,18 @@ Page({
     wx.showLoading({ title: '保存中...' })
     
     try {
-      const app = getApp()
-      const openId = app.globalData.openId || 'mock_'
-      
-      const data = {
-        action: 'saveSettings',
-        userId: openId,
-        dailyLimit: this.limitOptions[this.data.currentLimitIndex],
-        newWordRatio: this.ratioOptions[this.data.currentRatioIndex].split(' ')[0]
-      }
-      
-      const res = await wx.cloud.callContainer({
-        path: '/api/v1/word_query',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data
+      const res = await requestLib.request('/user_settings', {
+        method: 'PUT',
+        data: {
+          dailyLimit: parseInt(this.limitOptions[this.data.currentLimitIndex]),
+          newWordRatio: this.ratioOptions[this.data.currentRatioIndex].split(' ')[0]
+        }
       })
       
-      if (res.statusCode === 200 && res.data && (res.data.code === 200 || res.data.code === 201)) {
+      if (res && res.code === 200) {
         wx.showToast({ title: '保存成功', icon: 'success' })
       } else {
-        wx.showToast({ title: res.data.message || '保存失败', icon: 'none' })
+        wx.showToast({ title: res.message || '保存失败', icon: 'none' })
       }
     } catch (err) {
       wx.showToast({ title: '保存失败', icon: 'none' })
@@ -136,10 +104,7 @@ Page({
       wx.showToast({ title: '暂无待复习单词', icon: 'none' })
       return
     }
-    
-    wx.navigateTo({
-      url: '/pages/flash-card/flash-card?mode=review'
-    })
+    wx.navigateTo({ url: '/pages/flash-card/flash-card?mode=review' })
   },
 
   startLearning() {
@@ -147,9 +112,6 @@ Page({
       wx.showToast({ title: '今日新词已学完', icon: 'none' })
       return
     }
-    
-    wx.navigateTo({
-      url: '/pages/flash-card/flash-card?mode=new'
-    })
+    wx.navigateTo({ url: '/pages/flash-card/flash-card?mode=new' })
   }
 })

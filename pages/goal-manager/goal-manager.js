@@ -1,4 +1,6 @@
-// pages/goal-manager/goal-manager.js
+// pages/goal-manager/goal-manager.js - 微信云托管版
+const requestLib = require('../../utils/request')
+
 Page({
   data: {
     activeGoals: [],
@@ -20,14 +22,9 @@ Page({
   async loadGoals() {
     wx.showLoading({ title: '加载中...' })
     try {
-      const res = await wx.cloud.callContainer({
-        path: '/api/v1/goal_manager',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { action: 'list' }
-      })
-      if (res.statusCode === 200 && res.data && res.data.code === 200) {
-        const goals = res.data.data || []
+      const res = await requestLib.request('/goal_manager/list', { method: 'GET' })
+      if (res && res.code === 200) {
+        const goals = res.data || []
         this.setData({
           activeGoals: goals.filter(g => g.status === 'active'),
           completedGoals: goals.filter(g => g.status === 'completed')
@@ -98,7 +95,6 @@ Page({
     try {
       const action = this.data.editingId ? 'update' : 'create'
       const data = {
-        action,
         title: title.trim(),
         type,
         target_value: parseInt(target_value),
@@ -108,18 +104,16 @@ Page({
         data.goal_id = parseInt(this.data.editingId)
       }
 
-      const res = await wx.cloud.callContainer({
-        path: '/api/v1/goal_manager',
+      const res = await requestLib.request('/goal_manager', {
         method: 'POST',
-        header: { 'content-type': 'application/json' },
         data
       })
-      if (res.statusCode === 200 && res.data && (res.data.code === 200 || res.data.code === 201)) {
+      if (res && (res.code === 200 || res.code === 201)) {
         wx.showToast({ title: '保存成功', icon: 'success' })
         this.hideDialog()
         this.loadGoals()
       } else {
-        wx.showToast({ title: res.data.message || '保存失败', icon: 'none' })
+        wx.showToast({ title: res.message || '保存失败', icon: 'none' })
       }
     } catch (err) {
       wx.showToast({ title: '保存失败', icon: 'none' })

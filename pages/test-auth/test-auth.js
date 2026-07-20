@@ -1,5 +1,5 @@
-// pages/test-auth/test-auth.js
-import { checkAuth, tryGetOpenId } from '../../utils/permission.js'
+// pages/test-auth/test-auth.js - 微信云托管版
+const permission = require('../../utils/permission.js')
 
 Page({
   data: {
@@ -18,7 +18,7 @@ Page({
   },
 
   checkStatus() {
-    const auth = checkAuth()
+    const auth = permission.checkAuth()
     if (auth.authorized) {
       this.setData({ 
         needAuth: false,

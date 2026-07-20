@@ -1,5 +1,6 @@
-// pages/index/index.js - 宽松授权版
-import { checkAuth, showAuthRequiredTip } from '../../utils/permission.js'
+// pages/index/index.js - 微信云托管版
+const permission = require('../../utils/permission')
+const requestLib = require('../../utils/request')
 
 Page({
   data: {
@@ -16,6 +17,8 @@ Page({
     this.updateCurrentTime()
     
     // 检查授权状态
+    const checkAuth = permission.checkAuth
+    const showAuthRequiredTip = permission.showAuthRequiredTip
     const auth = checkAuth()
     if (!auth.authorized) {
       this.setData({ needAuth: true })
@@ -60,32 +63,25 @@ Page({
   },
 
   async loadData() {
-    const app = getApp()
-    const openId = app.globalData.openId || 'mock_'
+    wx.showLoading({ title: '加载中...' })
     
-    // 并行加载待复习数量和今日推荐单词
-    Promise.all([
-      wx.cloud.callContainer({
-        path: '/api/v1/user_stats',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { action: 'getReviewQueue', limit: 50 }
-      }),
-      wx.cloud.callContainer({
-        path: '/api/v1/word_query',
-        method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { action: 'getTodayRecommendation', userId: openId, limit: 5 }
-      })
-    ]).then(([reviewRes, todayRes]) => {
+    try {
+      // 并行加载待复习数量和今日推荐单词
+      const results = await Promise.all([
+        requestLib.request('/user_stats/review-queue?limit=50'),
+        requestLib.request('/word_query/recommend?limit=5')
+      ])
+      const reviewRes = results[0]
+      const todayRes = results[1]
+      
       let reviewCount = 0
-      if (reviewRes.statusCode === 200 && reviewRes.data && reviewRes.data.code === 200 && reviewRes.data.words) {
-        reviewCount = reviewRes.data.words.length
+      if (reviewRes && reviewRes.data) {
+        reviewCount = Array.isArray(reviewRes.data) ? reviewRes.data.length : 0
       }
       
       let todayWords = []
-      if (todayRes.statusCode === 200 && todayRes.data && todayRes.data.code === 200 && todayRes.data.data) {
-        todayWords = Array.isArray(todayRes.data.data) ? todayRes.data.data : [todayRes.data.data]
+      if (todayRes && todayRes.data) {
+        todayWords = Array.isArray(todayRes.data) ? todayRes.data : [todayRes.data].filter(Boolean)
       }
       
       this.setData({
@@ -93,36 +89,44 @@ Page({
         learnedCount: 0,  // 暂时不显示已学总数
         todayWords
       })
-    }).catch(err => {
+    } catch (err) {
       console.error('数据加载失败:', err)
-    })
+      const errMsg = err.message || ''
+      
+      // 如果是认证失败，提示用户去授权
+      if (errMsg.includes('登录') || errMsg.includes('授权')) {
+        this.setData({ needAuth: true })
+        wx.hideLoading()
+        showAuthRequiredTip()
+      } else {
+        wx.showToast({ 
+          title: '加载失败：' + errMsg, 
+          icon: 'none',
+          duration: 3000
+        })
+      }
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   loadRecommendWords() {
-    // 简单策略：从数据库取前 5 个词作为推荐
     wx.showLoading({ title: '加载中...' })
     
-    wx.cloud.callContainer({
-      path: '/api/v1/word_query',
-      method: 'POST',
-      header: { 'content-type': 'application/json' },
-      data: { 
-        action: 'getAll',
-        limit: 5,
-        offset: 0
-      }
-    }).then(res => {
-      wx.hideLoading()
-      if (res.statusCode === 200 && res.data && res.data.code === 200 && res.data.data && res.data.data.length > 0) {
-        this.setData({ todayWords: res.data.data })
-      } else {
+    requestLib.request('/word_query?limit=5&offset=0')
+      .then(res => {
+        wx.hideLoading()
+        if (res && res.data && Array.isArray(res.data)) {
+          this.setData({ todayWords: res.data })
+        } else {
+          this.setData({ todayWords: [] })
+        }
+      })
+      .catch(err => {
+        wx.hideLoading()
+        console.error('❌ 获取推荐单词失败:', err)
         this.setData({ todayWords: [] })
-      }
-    }).catch(err => {
-      wx.hideLoading()
-      console.error('❌ 获取推荐单词失败:', err)
-      this.setData({ todayWords: [] })
-    })
+      })
   },
 
   // 开始复习 - 需要授权

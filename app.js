@@ -1,63 +1,60 @@
-// app.js - 单词记忆助手（宽松授权版）
+// app.js - 单词记忆助手（微信云托管版）
 App({
   onLaunch() {
     console.log('🚀 单词记忆助手 - 微信小程序启动')
     
-    // 初始化云开发环境
-    if (!wx.cloud) {
-      console.error('❌ 微信开发者工具未启用云开发功能，请检查设置 → 详情 → 本地设置 → 启用云开发')
-      return
-    }
+    // ⚠️ 注意：已移除 wx.cloud.init()，不再使用云开发环境
+    // 所有 API 调用通过 utils/request.js 直接请求微信云托管后端
     
-    wx.cloud.init({
-      env: 'mytx-d7gw0vhq4414988b5',
-      traceUser: true
-    })
+    console.log('✅ 小程序初始化完成（云托管模式）')
     
-    console.log('✅ 云开发环境初始化成功')
-    
-    // 尝试从缓存恢复 OpenID（优先使用本地缓存）
+    // 尝试从缓存恢复 OpenID
     const savedOpenId = wx.getStorageSync('wx_openId')
     if (savedOpenId && this.isValidOpenId(savedOpenId)) {
       this.globalData.openId = savedOpenId
       console.log('✅ 从缓存恢复 OpenID:', savedOpenId.substring(0, 8) + '...')
     } else {
-      // 缓存失效或未找到，异步获取新 OpenID
+      // 延迟获取 OpenID（在页面加载时进行）
       this.getOpenId().then(openId => {
-        this.globalData.openId = openId
-        wx.setStorageSync('wx_openId', openId)
-        console.log('✅ 用户 OpenID:', openId.substring(0, 8) + '...')
+        if (openId) {
+          this.globalData.openId = openId
+          wx.setStorageSync('wx_openId', openId)
+          console.log('✅ 用户 OpenID:', openId.substring(0, 8) + '...')
+        } else {
+          console.warn('⚠️ OpenID 获取失败，部分功能将不可用')
+        }
       }).catch(err => {
         console.warn('⚠️ 获取 OpenID 失败:', err.message)
-        // 不再生成 mock ID，保留空字符串状态
-        this.globalData.openId = ''
-        console.log('⚠️ OpenID 为空，后续需要提示用户授权')
       })
     }
   },
 
-  // 验证 OpenID 是否有效（至少 20 个字符的 base32 编码）
+  // 验证 OpenID 是否有效
   isValidOpenId(openId) {
     if (!openId || typeof openId !== 'string') return false
     return openId.length >= 20
   },
 
-  // 通过云托管获取 OpenID
+  // 通过 HTTP API 获取 OpenID
   getOpenId() {
+    // 返回一个 Promise，稍后由 request.js 实现
     return new Promise((resolve, reject) => {
-      wx.cloud.callContainer({
-        path: '/api/v1/user_stats',
+      wx.request({
+        url: 'https://express-yoq0-283362-9-1453336058.sh.run.tcloudbase.com/api/v1/user_stats?action=getOpenId',
         method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: { action: 'getOpenId' }
-      }).then(res => {
-        if (res.statusCode === 200 && res.data && res.data.code === 200 && res.data.openId) {
-          resolve(res.data.openId)
-        } else {
-          reject(new Error('云托管返回错误'))
+        header: { 'Content-Type': 'application/json' },
+        timeout: 5000,
+        success: (res) => {
+          if (res.statusCode === 200 && res.data?.code === 200 && res.data?.openId) {
+            resolve(res.data.openId)
+          } else {
+            resolve('') // 降级为空字符串
+          }
+        },
+        fail: (err) => {
+          console.error('❌ 获取 OpenID 失败:', err)
+          resolve('')
         }
-      }).catch(err => {
-        reject(err)
       })
     })
   },
@@ -66,7 +63,7 @@ App({
     userInfo: null,
     currentWordCount: 0,
     streak: 0,
-    openId: '',  // 初始为空，成功后会赋值；如果失败则保持空
+    openId: '',  // 运行时获取
     needAuth: false  // 是否需要授权标识
   }
 })

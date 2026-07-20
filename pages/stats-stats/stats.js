@@ -1,4 +1,6 @@
-// pages/stats-stats/stats.js
+// pages/stats-stats/stats.js - 微信云托管版
+const requestLib = require('../../utils/request')
+
 Page({
   data: {
     currentStreak: 0,
@@ -25,19 +27,16 @@ Page({
     this.loadStats()
   },
 
-  loadStats() {
-    const app = getApp()
-    const openId = app.globalData.openId || 'mock_'
-    
-    // 加载整体统计数据
-    wx.cloud.callContainer({
-      path: '/api/v1/user_stats',
-      method: 'POST',
-      header: { 'content-type': 'application/json' },
-      data: { action: 'overview' }
-    }).then(res => {
-      if (res.statusCode === 200 && res.data && res.data.code === 200 && res.data.data) {
-        const stats = res.data.data
+  async loadStats() {
+    try {
+      // 加载整体统计数据
+      const res = await requestLib.request('/user_stats', {
+        method: 'POST',
+        data: { action: 'overview' }
+      })
+      
+      if (res && res.code === 200 && res.data) {
+        const stats = res.data
         
         this.setData({
           currentStreak: Number(stats.current_streak) || 0,
@@ -50,14 +49,14 @@ Page({
         
         // 判断徽章是否解锁
         const badges = this.checkBadges(stats)
-        this.setData({
-          isBadgeUnlocked: badges
-        })
+        this.setData({ isBadgeUnlocked: badges })
       }
-    })
-    
-    // 加载周数据（这里用模拟数据）
-    this.generateWeeklyData()
+    } catch (err) {
+      console.error('❌ 加载统计数据失败:', err)
+    } finally {
+      // 生成周数据（模拟数据保留）
+      this.generateWeeklyData()
+    }
   },
 
   generateWeeklyData() {

@@ -1,4 +1,6 @@
-// pages/words-list/words-list.js
+// pages/words-list/words-list.js - 微信云托管版
+const requestLib = require('../../utils/request')
+
 Page({
   data: {
     searchKeyword: '',
@@ -21,57 +23,43 @@ Page({
     this.loadWords()
   },
 
-  loadWords() {
+  async loadWords() {
     wx.showLoading({ title: '加载中...' })
     
-    const app = getApp()
-    const openId = app.globalData.openId || 'mock_'
-    
-    if (!openId) {
-      wx.hideLoading()
-      wx.showToast({ title: '用户未登录', icon: 'none' })
-      return
-    }
-
-    wx.cloud.callContainer({
-      path: '/api/v1/word_query',
-      method: 'POST',
-      header: { 'content-type': 'application/json' },
-      data: { 
-        action: 'getAll',
-        userId: openId
-      }
-    }).then(res => {
-      wx.hideLoading()
-      console.log('📋 word_query 返回:', JSON.stringify(res.data))
+    try {
+      const res = await requestLib.request('/word_query?limit=100&offset=0')
       
-      if (res.statusCode === 200 && res.data && res.data.code === 200) {
-        const words = res.data.data || []
+      console.log('📋 word_query 返回:', JSON.stringify(res))
+      
+      if (res && res.code === 200) {
+        const words = res.data || []
         
         this.setData({
           words: words,
-          totalWords: words.length,
+          totalWords: res.total || words.length,
           filteredWords: this.applyFilter(words)
         })
         
         this.updateStats(words)
       } else {
-        // 显示详细错误信息
-        const errMsg = res.data.message || '加载失败'
-        const errDetail = res.data.error ? `\n${res.data.error}` : ''
-        const errType = res.data.errorType ? `\n[${res.data.errorType}]` : ''
-        console.error('❌ 服务器错误详情:', res.data)
+        const errMsg = res?.message || '加载失败'
         wx.showToast({ 
-          title: errMsg + (errDetail ? ': ' + (res.data.error || '') : ''), 
+          title: errMsg, 
           icon: 'none',
-          duration: 5000
+          duration: 3000
         })
       }
-    }).catch(err => {
+    } catch (err) {
       wx.hideLoading()
-      console.error('❌ 云函数调用失败:', err)
-      wx.showToast({ title: 'API 调用失败: ' + (err.errMsg || ''), icon: 'none', duration: 5000 })
-    })
+      console.error('❌ API 调用失败:', err)
+      wx.showToast({ 
+        title: err.message || 'API 调用失败', 
+        icon: 'none', 
+        duration: 3000 
+      })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   applyFilter(words) {
@@ -136,7 +124,7 @@ Page({
     })
   },
 
-  playWordAudio(e) {
+  async playWordAudio(e) {
     const word = e.currentTarget.dataset.word
     const audio = e.currentTarget.dataset.audio || ''
     
@@ -144,35 +132,27 @@ Page({
       const innerAudioContext = wx.createInnerAudioContext()
       innerAudioContext.src = audio
       innerAudioContext.play()
-      
-      innerAudioContext.onError(err => {
-        console.error('❌ 音频播放失败:', err)
-      })
-    } else {
-      wx.cloud.callContainer({
-        path: '/api/v1/word_query',
+      innerAudioContext.onError(err => console.error('❌ 音频播放失败:', err))
+      return
+    }
+    
+    try {
+      const res = await requestLib.request('/word_query', {
         method: 'POST',
-        header: { 'content-type': 'application/json' },
-        data: {
-          action: 'tts',
-          word: word
-        }
-      }).then(res => {
-        if (res.statusCode === 200 && res.data && res.data.code === 200 && res.data.audioUrl) {
-          const innerAudioContext = wx.createInnerAudioContext()
-          innerAudioContext.src = res.data.audioUrl
-          innerAudioContext.play()
-          
-          innerAudioContext.onError(err => {
-            console.error('❌ 音频播放失败:', err)
-          })
-        } else {
-          wx.showToast({ title: '发音加载失败', icon: 'none' })
-        }
-      }).catch(err => {
-        console.error('❌ TTS 调用失败:', err)
-        wx.showToast({ title: 'API 错误', icon: 'none' })
+        data: { word }
       })
+      
+      if (res && res.code === 200 && res.data && res.data.audioUrl) {
+        const innerAudioContext = wx.createInnerAudioContext()
+        innerAudioContext.src = res.data.audioUrl
+        innerAudioContext.play()
+        innerAudioContext.onError(err => console.error('❌ 音频播放失败:', err))
+      } else {
+        wx.showToast({ title: '发音加载失败', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('❌ TTS 调用失败:', err)
+      wx.showToast({ title: 'API 错误', icon: 'none' })
     }
   }
 })

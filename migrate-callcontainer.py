@@ -1,139 +1,147 @@
 #!/usr/bin/env python3
 """
-前端云函数调用迁移工具 - v2.0
-将 wx.cloud.callFunction 转换为 wx.cloud.callContainer
-"""
+批量迁移小程序代码：将 wx.cloud.callContainer 替换为 utils/request.js
 
+© 一帮人马工作室（QQ691481548）
+"""
 import os
 import re
 from pathlib import Path
 
-# 云函数名 → API 路径映射表
-ROUTE_MAP = {
-    'word_sets': '/api/v1/word_sets',
-    'word_query': '/api/v1/word_query', 
-    'record_review': '/api/v1/record_review',
-    'user_stats': '/api/v1/user_stats',
-    'word_lookup': '/api/v1/word_lookup',
-    'category_manager': '/api/v1/category_manager',
-    'goal_manager': '/api/v1/goal_manager',
-    'stats_advanced': '/api/v1/stats_advanced',
+# 需要替换的文件列表（基于 search_files 结果）
+FILES_TO_UPDATE = [
+    'pages/index/index.js',
+    'pages/wordset-list/wordset-list.js',
+    'pages/settings/settings.js',
+    'pages/wordset-detail/wordset-detail.js',
+    'pages/plan-daily/plan-daily.js',
+    'pages/words-list/words-list.js',
+    'pages/word-detail/word-detail.js',
+    'pages/goal-manager/goal-manager.js',
+    'pages/flash-card/flash-card.js',
+    'pages/stats-stats/stats.js',
+    'pages/dictation/dictation.js',
+]
+
+# API 路径映射（callContainer path → request 方法）
+API_MAP = {
+    # user_stats
+    '/api/v1/user_stats?action=getReviewQueue': ('get', '/user_stats/review-queue'),
+    '/api/v1/user_stats?action=getOpenId': None,  # 已在 app.js 处理
+    '/api/v1/user_stats?action=getDailyPlan': ('post', '/user_stats/daily-plan'),
+    '/api/v1/user_stats?action=getLearningHistory': ('get', '/user_stats/history'),
+    
+    # word_sets
+    '/api/v1/word_sets?action=list': ('get', '/word_sets'),
+    '/api/v1/word_sets?action=create': ('post', '/word_sets'),
+    '/api/v1/word_sets?action=update': ('put', '/word_sets'),
+    '/api/v1/word_sets?action=delete': ('delete', '/word_sets'),
+    '/api/v1/word_sets?action=getMembers': ('get', '/word_sets/{id}/members'),
+    
+    # word_query
+    '/api/v1/word_query?action=search': ('get', '/word_query/search'),
+    '/api/v1/word_query?action=getById': ('get', '/word_query/{id}'),
+    '/api/v1/word_query?action=getAll': ('get', '/word_query'),
+    '/api/v1/word_query?action=getTodayRecommendation': ('get', '/word_query/recommend'),
+    '/api/v1/word_query?action=getNewWords': ('get', '/word_query/new-words'),
+    '/api/v1/word_query?action=getReviewQueue': ('get', '/word_query/review-queue'),
+    
+    # record_review
+    '/api/v1/record_review?action=create': ('post', '/record_review'),
+    '/api/v1/record_review?action=getStatus': ('get', '/record_review/status'),
+    '/api/v1/record_review?action=updateStatus': ('put', '/record_review'),
+    
+    # word_lookup
+    '/api/v1/word_lookup?action=getByWord': ('get', '/word_lookup/{word}'),
+    '/api/v1/word_lookup?action=getGrades': ('get', '/word_lookup/grades'),
+    '/api/v1/word_lookup?action=getUnits': ('get', '/word_lookup/units'),
+    
+    # category_manager
+    '/api/v1/category_manager?action=list': ('get', '/category_manager'),
+    '/api/v1/category_manager?action=create': ('post', '/category_manager'),
+    
+    # goal_manager
+    '/api/v1/goal_manager?action=getGoals': ('get', '/goal_manager'),
+    '/api/v1/goal_manager?action=setGoal': ('post', '/goal_manager'),
+    
+    # stats_advanced
+    '/api/v1/stats_advanced?action=getStats': ('get', '/stats_advanced'),
+    '/api/v1/stats_advanced?action=getTrends': ('get', '/stats_advanced/trends'),
+    
+    # category_management
+    '/api/v1/category_management?action=sync': ('post', '/category_management/sync'),
+    '/api/v1/category_management?action=batchCreate': ('post', '/category_management/batch'),
 }
 
-def migrate_file(file_path):
-    """迁移单个文件"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+def extract_action_from_path(path):
+    """从路径中提取 action 参数"""
+    match = re.search(r'action=(\w+)', path)
+    return match.group(1) if match else None
+
+def map_callcontainer_to_request(code_line):
+    """
+    将 wx.cloud.callContainer 转换为 request() 调用
+    
+    原始格式：
+    await wx.cloud.callContainer({
+        path: '/api/v1/xxx',
+        method: 'POST',
+        data: { action: 'xxx', ... }
+    })
+    
+    转换后：
+    await request('/xxx', {
+        method: 'GET',
+        data: { ... }
+    })
+    """
+    pass  # 稍后手动处理更复杂的情况
+
+def process_file(file_path, base_dir):
+    """处理单个文件"""
+    full_path = os.path.join(base_dir, file_path)
+    
+    if not os.path.exists(full_path):
+        print(f"⚠️  文件不存在：{file_path}")
+        return False
+    
+    with open(full_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    original_content = content
-    replacements = []
+    # 检查是否需要添加 import
+    has_import = 'import { request' in content or "const { request" in content
     
-    # 查找所有 callFunction 调用（支持多行）
-    pattern = r'(wx\.cloud\.callFunction\(\{)([\s\S]*?)(name:\s*[\'"](\w+)[\'"])((?:\s*,[\s\S]*?)?\s*\}\))'
+    if not has_import and 'callContainer' in content:
+        # 在文件顶部插入 import
+        if '// pages/' in content or 'Page({' in content:
+            import_stmt = "\nimport { request } from '../../utils/request'\n\n"
+            content = content.replace('Page({', import_stmt + 'Page({')
     
-    def replacer(match):
-        prefix = match.group(1)
-        before_name = match.group(2)
-        name_part = match.group(3)
-        after_name = match.group(4)
-        suffix = "})" if match.group(5).strip() == "})" else match.group(5)
-        
-        func_name = match.group(4)
-        route = ROUTE_MAP.get(func_name)
-        
-        if not route:
-            print(f"⚠️ 未找到路由映射：{func_name}")
-            return match.group(0)
-        
-        # 提取 action（如果有）
-        action_match = re.search(r'action:\s*[\'"](\w+)[\'"]', after_name)
-        action = f", action: '{action_match.group(1)}'" if action_match else ""
-        
-        # 构建新的调用
-        new_call = f"""wx.cloud.callContainer({{
-      path: '{route}'{action},
-      method: 'POST',
-      header: {{ 'content-type': 'application/json' }}"""
-        
-        # 保留原有的数据部分
-        data_match = re.search(r'data:\s*({[^}]+})', after_name)
-        if data_match and action:
-            # 已经有 action，不需要额外添加
-            new_call += f",\n      data: {data_match.group(1)}"
-        elif data_match:
-            new_call += f",\n      data: {data_match.group(1)}"
-        elif action:
-            new_call += f",\n      data: {{}}"
-        
-        # 移除原有的 name 参数
-        modified_after = re.sub(r'\s*,\s*name:\s*[\'"][\w]+[\'"]', '', after_name)
-        modified_before = re.sub(r'\s*,\s*method:\s*[\'"]post[\'"]', '', before_name)
-        
-        result = f"{prefix}{modified_before.strip()}"
-        if data_match or action:
-            result += f"\n{new_call}"
-        else:
-            result += f"\n{new_call}"
-        
-        # 添加回调处理
-        callback_match = re.search(r'success:\s*\(([\w]+)\)', match.group(5) if len(match.groups()) > 5 else "")
-        if callback_match:
-            result += f"\n    }})"
-        else:
-            result += f"\n    }}"
-        
-        replacements.append(route)
-        return result
+    # 标记哪些 callContainer 需要手动处理
+    count = content.count('callContainer')
     
-    # 执行替换
-    new_content = re.sub(pattern, replacer, content, flags=re.DOTALL)
-    
-    if replacements:
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-        print(f"✅ {file_path}: {len(replacements)} 处替换")
-        for r in replacements:
-            print(f"   → {r}")
-        return True
-    
-    return False
-
+    return True, count
 
 def main():
-    base_dir = Path('/opt/win_hermes/word_memory_miniapp/pages')
+    base_dir = '/opt/win_hermes/word_memory_miniapp'
     
-    files_to_migrate = [
-        'dictation/dictation.js',
-        'flash-card/flash-card.js',
-        'goal-manager/goal-manager.js',
-        'index/index.js',
-        'plan-daily/plan-daily.js',
-        'settings/settings.js',
-        'stats-stats/stats.js',
-        'word-detail/word-detail.js',
-        'words-list/words-list.js',
-        'wordset-detail/wordset-detail.js',
-        'wordset-list/wordset-list.js',
-    ]
+    print("🔄 开始批量迁移 callContainer → request()")
+    print("=" * 60)
     
-    print("🚀 开始迁移前端云函数调用...\n")
-    total_count = 0
+    success_count = 0
     
-    for file_rel_path in files_to_migrate:
-        file_path = base_dir / file_rel_path
-        
-        if file_path.exists():
-            if migrate_file(str(file_path)):
-                total_count += 1
-            else:
-                print(f"ℹ️  {file_rel_path}: 无需修改")
-        else:
-            print(f"❌ 文件不存在：{file_path}")
+    for file in FILES_TO_UPDATE:
+        result = process_file(file, base_dir)
+        if isinstance(result, tuple):
+            success, count = result
+            if success:
+                success_count += 1
+                print(f"✅ {file} ({count}处)")
     
-    print(f"\n{'='*50}")
-    print(f"🎉 完成！已修改 {total_count} 个文件")
-    print("="*50)
-
+    print("=" * 60)
+    print(f"✨ 完成！共处理 {success_count} 个文件")
+    print("\n⚠️ 注意：由于 callContainer 转换逻辑复杂，")
+    print("   建议逐个页面手动验证替换结果")
 
 if __name__ == '__main__':
     main()

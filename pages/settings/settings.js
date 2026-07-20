@@ -1,5 +1,5 @@
-// pages/settings/settings.js
-const app = getApp()
+// pages/settings/settings.js - 微信云托管版
+const requestLib = require('../../utils/request')
 
 Page({
   data: {
@@ -8,45 +8,37 @@ Page({
     totalLearned: 0,
     masteredCount: 0,
     accuracy: 0,
-    
     soundEnabled: true
   },
 
   onLoad() {
-    const app = getApp()
-    this.setData({ userId: (app.globalData.openId || 'mock_').substring(0, 8) + '...' })
-    
+    this.setData({ userId: 'user_xxx...' })
     this.loadStats()
     
-    // 加载设置
     const sound = wx.getStorageSync('sound_enabled')
     if (sound !== undefined) {
       this.setData({ soundEnabled: sound })
     }
   },
 
-  loadStats() {
-    wx.cloud.callContainer({
-      path: '/api/v1/user_stats',
-      method: 'POST',
-      header: { 'content-type': 'application/json' },
-      data: { action: 'overview' }
-    }).then(res => {
-      if (res.statusCode === 200 && res.data && res.data.code === 200 && res.data.data) {
+  async loadStats() {
+    try {
+      const res = await requestLib.request('/user_stats/overview', { method: 'GET' })
+      if (res && res.code === 200 && res.data) {
         this.setData({
           statsReady: true,
-          totalLearned: res.data.data.total_learned || 0,
-          masteredCount: res.data.data.total_mastered || 0,
-          accuracy: res.data.data.accuracy || 0
+          totalLearned: res.data.total_learned_new || 0,
+          masteredCount: res.data.total_mastered || 0,
+          accuracy: res.data.accuracy || 0
         })
       }
-    })
+    } catch (err) {
+      console.error('加载统计失败:', err)
+    }
   },
 
   goToDailyPlan() {
-    wx.navigateTo({
-      url: '/pages/plan-daily/plan-daily'
-    })
+    wx.navigateTo({ url: '/pages/plan-daily/plan-daily' })
   },
 
   onSoundChange(e) {
@@ -60,42 +52,26 @@ Page({
       title: '确认重置',
       content: '此操作将清空所有学习记录，不可恢复！请慎重考虑。',
       confirmColor: '#ff6b6b',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '处理中...' })
           
-          const app = getApp()
-          const openId = app.globalData.openId || 'mock_'
-          
-          wx.cloud.callContainer({
-            path: '/api/v1/word_query',
-            method: 'POST',
-            header: { 'content-type': 'application/json' },
-            data: { 
-              action: 'resetUserData',
-              userId: openId
-            }
-          }).then(res => {
+          try {
+            const response = await requestLib.request('/user_reset', { method: 'POST' })
+            
             wx.hideLoading()
             
-            if (res.statusCode === 200 && res.data && res.data.code === 200) {
-              wx.showToast({ 
-                title: '进度已重置', 
-                icon: 'success',
-                duration: 2000
-              })
-              
-              setTimeout(() => {
-                wx.reLaunch({ url: '/pages/index/index' })
-              }, 1500)
+            if (response && response.code === 200) {
+              wx.showToast({ title: '进度已重置', icon: 'success', duration: 2000 })
+              setTimeout(() => wx.reLaunch({ url: '/pages/index/index' }), 1500)
             } else {
-              wx.showToast({ title: res.data.message || '重置失败', icon: 'none' })
+              wx.showToast({ title: response.message || '重置失败', icon: 'none' })
             }
-          }).catch(err => {
+          } catch (err) {
             wx.hideLoading()
             console.error('❌ 重置失败:', err)
             wx.showToast({ title: 'API 错误', icon: 'none' })
-          })
+          }
         }
       }
     })
