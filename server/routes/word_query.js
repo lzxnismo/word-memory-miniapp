@@ -166,7 +166,7 @@ router.get('/', async (req, res) => {
 })
 
 // GET /recommend?limit=5 — 智能推荐今日学习单词（基于 SM-2 算法）
-router.get('/recommend', async (req, res) => {
+router.post('/recommend', async (req, res) => {
   try {
     const { limit = 5 } = req.query
     const db = getPool()

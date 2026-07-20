@@ -107,8 +107,8 @@ router.get('/history', async (req, res) => {
   }
 })
 
-// GET /review-queue?limit=50 — 待复习队列
-router.get('/review-queue', async (req, res) => {
+// POST /review-queue?limit=50 — 待复习队列
+router.post('/review-queue', async (req, res) => {
   try {
     const { limit = 50 } = req.query
     const db = getPool()
