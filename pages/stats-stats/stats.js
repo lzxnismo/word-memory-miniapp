@@ -30,10 +30,7 @@ Page({
   async loadStats() {
     try {
       // 加载整体统计数据
-      const res = await requestLib.request('/user_stats', {
-        method: 'POST',
-        data: { action: 'overview' }
-      })
+      const res = await requestLib.request('/user_stats/overview', { method: 'GET' })
       
       if (res && res.code === 200 && res.data) {
         const stats = res.data

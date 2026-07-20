@@ -60,10 +60,7 @@ Page({
 
     wx.showLoading({ title: '查找中...' })
     try {
-      const res = await requestLib.request('/word_lookup', {
-        method: 'POST',
-        data: { word }
-      })
+      const res = await requestLib.request(`/word_lookup/lookup?word=${word}`, { method: 'GET' })
       if (res && res.code === 200) {
         this.setData({ lookupResult: res.data })
       } else {
@@ -82,10 +79,9 @@ Page({
 
     wx.showLoading({ title: '添加中...' })
     try {
-      const res = await requestLib.request('/word_sets/add_word', {
+      const res = await requestLib.request(`/word_sets/${this.data.setId}/words`, {
         method: 'POST',
         data: {
-          set_id: parseInt(this.data.setId),
           word_id: result.word_id || result.id,
           word: result.word
         }

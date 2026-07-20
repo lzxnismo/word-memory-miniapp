@@ -22,7 +22,7 @@ Page({
   async loadGoals() {
     wx.showLoading({ title: '加载中...' })
     try {
-      const res = await requestLib.request('/goal_manager/list', { method: 'GET' })
+      const res = await requestLib.request('/goal_manager', { method: 'GET' })
       if (res && res.code === 200) {
         const goals = res.data || []
         this.setData({

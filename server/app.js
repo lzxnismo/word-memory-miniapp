@@ -89,6 +89,9 @@ app.use('/api/v1/stats_advanced', statsAdvancedRouter)
 const categoryManagementRouter = require('./routes/category_management')
 app.use('/api/v1/category_management', categoryManagementRouter)
 
+const userSettingsRouter = require('./routes/user_settings')
+app.use('/api/v1/user_settings', userSettingsRouter)
+
 // ==================== 错误处理 ====================
 
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')

@@ -184,7 +184,7 @@ Page({
     wx.showLoading({ title: '提交中...' })
     
     try {
-      const res = await requestLib.request('/record_review', {
+      const res = await requestLib.request('/record', {
         method: 'POST',
         data: reviewData
       })

@@ -28,7 +28,7 @@ Page({
     try {
       const results = await Promise.all([
         requestLib.request('/word_query', { method: 'POST', data: { wordId } }),
-        requestLib.request(`/user_memory/${wordId}`, { method: 'GET' })
+        requestLib.request(`/record_review/memory/${wordId}`, { method: 'GET' })
       ])
       const wordRes = results[0]
       const memoryRes = results[1]
@@ -113,7 +113,7 @@ Page({
     wx.showLoading({ title: '提交中...' })
     
     try {
-      const res = await requestLib.request('/record_review', {
+      const res = await requestLib.request('/record', {
         method: 'POST',
         data: {
           wordId: this.data.wordData.id,
@@ -143,7 +143,7 @@ Page({
     this.setData({ lookupLoading: true })
     
     try {
-      const res = await requestLib.request(`/word_lookup/${this.data.wordData.word}`, { method: 'GET' })
+      const res = await requestLib.request(`/word_lookup/lookup?word=${this.data.wordData.word}`, { method: 'GET' })
       if (res && res.code === 200 && res.data) {
         this.setData({ lookupResult: res.data })
       } else {
