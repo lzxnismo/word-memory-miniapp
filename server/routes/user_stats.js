@@ -115,7 +115,7 @@ router.get('/review-queue', async (req, res) => {
     
     // 获取今日待复习单词（SM-2 状态活跃且到期）
     const [rows] = await db.execute(`
-      SELECT uwm.word_id, w.word, w.phonetic, w.definition,
+      SELECT uwm.word_id, w.word, w.phonetic, w.meaning,
              uwm.next_review, uwm.ladder, uwm.review_count, uwm.quality
       FROM user_word_memories uwm
       JOIN words w ON uwm.word_id = w.id
