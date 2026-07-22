@@ -737,6 +737,7 @@ speechSynthesis.speak(utterance)
 | `docs/DATABASE.md` | 数据库设计 — 9 张表结构、字段说明、SM-2 核心字段 |
 | `docs/DESIGN.md` | 设计文档 — SM-2 算法公式、学习模式设计、统计设计 |
 | `docs/USER_GUIDE.md` | 用户指南 — 功能说明、学习流程、常见问题 |
+| `docs/OPS_MANUAL.md` | 运维手册 — 环境变量、连接信息、部署流程、开发配置 |
 | `docs/miniapp-api-guide.md` | API 对接指南 — 所有接口文档 |
 | `docs/RELEASE_CHECKLIST.md` | 发布检查清单 — 上线前逐项确认 |
 | `docs/MIGRATION_COMPLETE.md` | 迁移报告 — 从云函数到云托管的迁移总结 |
