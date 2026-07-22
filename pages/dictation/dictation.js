@@ -33,10 +33,10 @@ Page({
     this.setData({ loading: true })
     
     try {
-      const res = await requestLib.request('/user_stats/review-queue', { method: 'GET' })
+      const res = await requestLib.request('/user_stats/review-queue', { method: 'POST' })
       
-      if (res && res.code === 200 && res.data && res.data.words) {
-        const words = res.data.words.slice(0, 20)
+      if (res && res.code === 200 && res.data && Array.isArray(res.data)) {
+        const words = res.data.slice(0, 20)
         
         this.setData({
           words: words,
@@ -90,23 +90,23 @@ Page({
     if (isAutoPlay) wx.showLoading({ title: '加载中...' })
     
     try {
-      const res = await requestLib.request('/word_query', {
-        method: 'POST',
-        data: { word }
-      })
+      const res = await requestLib.request(`/word_query/search?keyword=${encodeURIComponent(word)}`, { method: 'GET' })
       
       if (isAutoPlay) wx.hideLoading()
       
-      if (res && res.code === 200 && res.data && res.data.audioUrl) {
-        const innerAudioContext = wx.createInnerAudioContext()
-        innerAudioContext.src = res.data.audioUrl
-        innerAudioContext.play()
+      if (res && res.code === 200 && res.data && res.data.length > 0) {
+        const wordData = res.data[0]
+        if (wordData.audioUrl) {
+          const innerAudioContext = wx.createInnerAudioContext()
+          innerAudioContext.src = wordData.audioUrl
+          innerAudioContext.play()
         
-        if (isAutoPlay) {
-          innerAudioContext.onEnded(() => this.startTimer())
+          if (isAutoPlay) {
+            innerAudioContext.onEnded(() => this.startTimer())
+          }
+        
+          innerAudioContext.onError(err => console.error('❌ 音频播放失败:', err))
         }
-        
-        innerAudioContext.onError(err => console.error('❌ 音频播放失败:', err))
       } else if (isAutoPlay) {
         wx.showToast({ title: '发音加载失败', icon: 'none' })
       }

@@ -60,7 +60,7 @@ Page({
 
     wx.showLoading({ title: '查找中...' })
     try {
-      const res = await requestLib.request(`/word_lookup/lookup?word=${word}`, { method: 'GET' })
+      const res = await requestLib.request(`/word_sets/lookup/${encodeURIComponent(word)}`, { method: 'GET' })
       if (res && res.code === 200) {
         this.setData({ lookupResult: res.data })
       } else {
@@ -82,8 +82,7 @@ Page({
       const res = await requestLib.request(`/word_sets/${this.data.setId}/words`, {
         method: 'POST',
         data: {
-          word_id: result.word_id || result.id,
-          word: result.word
+          wordId: result.word_id || result.id
         }
       })
       if (res && (res.code === 200 || res.code === 201)) {
@@ -118,7 +117,7 @@ Page({
           wx.showLoading({ title: '删除中...' })
           try {
             const result = await requestLib.request(`/word_sets/${this.data.setId}`, { method: 'DELETE' })
-            if (result && result.code === 204) {
+            if (result && result.code === 200) {
               wx.showToast({ title: '已删除', icon: 'success' })
               setTimeout(() => wx.navigateBack(), 1000)
             } else {

@@ -96,14 +96,16 @@ app.use('/api/v1/user_settings', userSettingsRouter)
 const debugRouter = require('./routes/debug')
 app.use('/api/v1/debug', debugRouter)
 
-// ==================== 错误处理 ====================
+// Phase 3: 认证登录
+const authRouter = require('./routes/auth')
+app.use('/api/v1/auth', authRouter)
 
+// ==================== 错误处理 ====================
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
 app.use(notFoundHandler)
 app.use(errorHandler)
 
 // ==================== 启动服务 ====================
-
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -15,6 +15,21 @@ const CONFIG = {
   debug: true         // 开启调试日志 ✨
 }
 
+// 登录等待机制：确保 app.js 的 login() 完成后再发请求
+let loginPromise = null
+
+function ensureLogin() {
+  const app = getApp()
+  if (app.globalData?.openId) return Promise.resolve()
+  if (loginPromise) return loginPromise
+  // 等待 app.js 的 login 方法完成
+  if (typeof app.login === 'function') {
+    loginPromise = app.login()
+    return loginPromise
+  }
+  return Promise.resolve()
+}
+
 /**
  * 获取用户 OpenID
  * @returns {Promise<string>} 用户唯一标识
@@ -65,6 +80,7 @@ async function request(url, options = {}) {
   
   // 认证：如果需要且不是 test 模式
   if (auth) {
+    await ensureLogin() // 等待登录完成
     const openid = await getOpenId()
     
     if (!openid) {
@@ -77,13 +93,21 @@ async function request(url, options = {}) {
   
   // 发起网络请求
   try {
-    const response = await wx.request({
-      url: fullUrl,
-      method: method.toUpperCase(),
-      data: method === 'GET' ? undefined : data,
-      header: headers,
-      dataType: 'json',
-      timeout: CONFIG.timeout
+    // 使用 Promise 包装 wx.request，确保正确处理 success/fail 回调
+    const response = await new Promise((resolve, reject) => {
+      wx.request({
+        url: fullUrl,
+        method: method.toUpperCase(),
+        data: method === 'GET' ? undefined : data,
+        header: headers,
+        dataType: 'json',
+        timeout: CONFIG.timeout,
+        success: (res) => resolve(res),
+        fail: (err) => {
+          console.error(`❌ wx.request 网络层失败: ${fullUrl}`, err)
+          reject(new Error(err.errMsg || '网络请求失败'))
+        }
+      })
     })
     
     // 调试日志
@@ -93,6 +117,11 @@ async function request(url, options = {}) {
         status: response.statusCode,
         data: response.data
       })
+    }
+    
+    // 检查网络响应是否有效
+    if (!response.statusCode) {
+      throw new Error('网络连接失败，请检查网络设置或云托管服务状态')
     }
     
     // 业务状态码判断

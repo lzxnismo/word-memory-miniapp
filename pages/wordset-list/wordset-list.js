@@ -19,7 +19,7 @@ Page({
   async loadSets() {
     wx.showLoading({ title: '加载中...' })
     try {
-      const res = await requestLib.request('/word_sets')
+      const res = await requestLib.request('/word_sets', { method: 'GET' })
       if (res && res.data) {
         this.setData({ sets: res.data })
       }

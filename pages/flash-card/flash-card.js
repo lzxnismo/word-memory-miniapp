@@ -26,6 +26,8 @@ Page({
     
     if (this.data.mode === 'quick' && options.wordId) {
       this.loadSingleWord(options.wordId)
+    } else if (options.source === 'wordset' && options.sourceId) {
+      this.loadWordSetWords(options.sourceId)
     } else {
       this.loadStudyQueue()
     }
@@ -45,13 +47,10 @@ Page({
     this.setData({ loading: true })
     
     try {
-      const res = await requestLib.request('/word_query', {
-        method: 'POST',
-        data: { wordId }
-      })
+      const res = await requestLib.request(`/word_query/${wordId}`, { method: 'GET' })
       
       if (res && res.code === 200 && res.data) {
-        const words = Array.isArray(res.data) ? res.data : [res.data]
+        const words = [res.data]
         if (words.length > 0) {
           this.setData({
             queue: words,
@@ -73,6 +72,35 @@ Page({
     }
   },
 
+  async loadWordSetWords(setId) {
+    this.setData({ loading: true, mode: 'quick' })
+    
+    try {
+      const res = await requestLib.request(`/word_sets/${setId}`, { method: 'GET' })
+      
+      if (res && res.code === 200 && res.data && Array.isArray(res.data.words)) {
+        const words = res.data.words
+        this.setData({
+          queue: words,
+          currentIndex: 0,
+          currentWord: null,
+          totalWords: words.length,
+          loading: false,
+          learningComplete: false
+        })
+        
+        setTimeout(() => this.loadNextWord(), 300)
+      } else {
+        wx.showToast({ title: '加载失败', icon: 'none' })
+        this.setData({ queue: [], loading: false })
+      }
+    } catch (err) {
+      console.error('❌ 加载单词集失败:', err)
+      wx.showToast({ title: 'API 错误', icon: 'none' })
+      this.setData({ loading: false })
+    }
+  },
+
   async loadStudyQueue() {
     this.setData({ loading: true })
     
@@ -88,14 +116,14 @@ Page({
     }
     
     try {
-      const res = await requestLib.request('/user_stats/review-queue', { method: 'GET' })
+      const res = await requestLib.request('/user_stats/review-queue', { method: 'POST' })
       
-      if (res && res.code === 200 && res.data && res.data.words) {
+      if (res && res.code === 200 && res.data && Array.isArray(res.data)) {
         this.setData({
-          queue: res.data.words.slice(0, params.limit),
+          queue: res.data.slice(0, params.limit),
           currentIndex: 0,
           currentWord: null,
-          totalWords: res.data.words.length,
+          totalWords: res.data.length,
           loading: false,
           learningComplete: false
         })
@@ -139,23 +167,23 @@ Page({
     wx.showLoading({ title: '加载中...' })
     
     try {
-      const res = await requestLib.request('/word_query', {
-        method: 'POST',
-        data: { word }
-      })
+      const res = await requestLib.request(`/word_query/search?keyword=${encodeURIComponent(word)}`, { method: 'GET' })
       
       wx.hideLoading()
       
-      if (res && res.code === 200 && res.data && res.data.audioUrl) {
-        const innerAudioContext = wx.createInnerAudioContext()
-        innerAudioContext.src = res.data.audioUrl
-        innerAudioContext.play()
+      if (res && res.code === 200 && res.data && res.data.length > 0) {
+        const wordData = res.data[0]
+        if (wordData.audioUrl) {
+          const innerAudioContext = wx.createInnerAudioContext()
+          innerAudioContext.src = wordData.audioUrl
+          innerAudioContext.play()
         
-        innerAudioContext.onEnded(() => {
-          this.setData({ showAudioButton: false })
-        })
+          innerAudioContext.onEnded(() => {
+            this.setData({ showAudioButton: false })
+          })
         
-        innerAudioContext.onError(err => console.error('❌ 音频播放失败:', err))
+          innerAudioContext.onError(err => console.error('❌ 音频播放失败:', err))
+        }
       } else {
         wx.showToast({ title: '发音加载失败', icon: 'none' })
       }
