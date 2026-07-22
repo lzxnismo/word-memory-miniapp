@@ -43,7 +43,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    version: '2.0.0',
+    version: '2.1.0',
     app: 'Word Memory System',
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
   res.json({
     message: '欢迎使用单词记忆系统 API',
     docs: '/health',
-    version: '2.0.0'
+    version: '2.1.0'
   })
 })
 
