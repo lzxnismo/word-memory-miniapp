@@ -1,154 +1,101 @@
 /**
  * utils/request.js — 统一 HTTP 请求封装
  * 
- * 替换 wx.cloud.callContainer，直接使用 wx.request
- * 微信云托管 REST API 专用
+ * 使用 wx.cloud.callContainer() 走微信内网直达云托管
+ * 云托管网关自动注入 x-wx-openid，无需手动登录
  * 
  * © 一帮人马工作室（QQ691481548）
  */
 
-const BASE_URL = 'https://express-yoq0-283362-9-1453336058.sh.run.tcloudbase.com/api/v1'
+// 云托管环境配置
+const CLOUD_CONFIG = {
+  env: 'prod-d2g668gku1c36b430',   // 云托管环境 ID
+  service: 'express-yoq0',           // 云托管服务名称（从控制台服务列表获取）
+  timeout: 15000                     // 超时时间 15s
+}
 
 // 全局配置
 const CONFIG = {
-  timeout: 15000,     // 超时时间 15s
-  debug: true         // 开启调试日志 ✨
-}
-
-// 登录等待机制：确保 app.js 的 login() 完成后再发请求
-let loginPromise = null
-
-function ensureLogin() {
-  const app = getApp()
-  if (app.globalData?.openId) return Promise.resolve()
-  if (loginPromise) return loginPromise
-  // 等待 app.js 的 login 方法完成
-  if (typeof app.login === 'function') {
-    loginPromise = app.login()
-    return loginPromise
-  }
-  return Promise.resolve()
+  debug: true         // 开启调试日志
 }
 
 /**
- * 获取用户 OpenID
- * @returns {Promise<string>} 用户唯一标识
- */
-async function getOpenId() {
-  const app = getApp()
-  
-  // 优先使用缓存的 OpenID
-  if (app.globalData?.openId) {
-    return app.globalData.openId
-  }
-  
-  // 从本地缓存读取
-  try {
-    const cached = wx.getStorageSync('wx_openId')
-    if (cached) {
-      app.globalData.openId = cached
-      return cached
-    }
-  } catch (err) {
-    console.warn('⚠️ 读取 OpenID 缓存失败:', err.message)
-  }
-  
-  // 降级：返回空字符串（后端会返回 401）
-  // 注意：不再依赖云函数获取，改用本地缓存或授权流程
-  return ''
-}
-
-/**
- * 发送 HTTP 请求（推荐方式）
+ * 发送 HTTP 请求（通过微信内网 callContainer）
  * @param {string} url - 请求路径（不含 /api/v1/ 前缀）
  * @param {object} options - 请求选项
- * @param {string} options.method - GET/POST（默认 POST）
+ * @param {string} options.method - GET/POST/PUT/DELETE（默认 POST）
  * @param {object} options.data - 请求参数
- * @param {boolean} options.auth - 是否需要用户认证（默认 true）
+ * @param {boolean} options.auth - 是否需要用户认证（默认 true，云托管自动注入）
  * @returns {Promise<object>} 响应结果
  */
 async function request(url, options = {}) {
   const { method = 'POST', data = {}, auth = true } = options
-  
-  // 构建完整 URL
-  const fullUrl = `${BASE_URL}${url.startsWith('/') ? url : '/' + url}`
-  
-  // 准备请求头
-  const headers = {
-    'Content-Type': 'application/json'
-  }
-  
-  // 认证：如果需要且不是 test 模式
-  if (auth) {
-    await ensureLogin() // 等待登录完成
-    const openid = await getOpenId()
-    
-    if (!openid) {
-      console.warn('⚠️ 未获取到 OpenID，后续调用将返回 401')
-      throw new Error('登录失效，请重新登录')
-    }
-    
-    headers['x-wx-openid'] = openid
-  }
-  
-  // 发起网络请求
+
+  // 规范化路径
+  const path = url.startsWith('/') ? url : '/' + url
+
   try {
-    // 使用 Promise 包装 wx.request，确保正确处理 success/fail 回调
+    // 使用 wx.cloud.callContainer 走微信内网
     const response = await new Promise((resolve, reject) => {
-      wx.request({
-        url: fullUrl,
+      wx.cloud.callContainer({
+        config: {
+          env: CLOUD_CONFIG.env
+        },
+        path: '/api/v1' + path,
         method: method.toUpperCase(),
-        data: method === 'GET' ? undefined : data,
-        header: headers,
-        dataType: 'json',
-        timeout: CONFIG.timeout,
+        data: data,
+        header: {
+          'Content-Type': 'application/json',
+          'X-WX-SERVICE': CLOUD_CONFIG.service  // 云托管服务名称，必须指定
+        },
+        timeout: CLOUD_CONFIG.timeout,
         success: (res) => resolve(res),
         fail: (err) => {
-          console.error(`❌ wx.request 网络层失败: ${fullUrl}`, err)
-          reject(new Error(err.errMsg || '网络请求失败'))
+          console.error(`❌ callContainer 失败: ${path}`, err)
+          reject(new Error(err.errMsg || err.message || '网络请求失败'))
         }
       })
     })
-    
+
     // 调试日志
     if (CONFIG.debug) {
-      console.log(`🔹 ${method} ${fullUrl}`, {
+      console.log(`🔹 ${method} ${path}`, {
         params: data,
         status: response.statusCode,
         data: response.data
       })
     }
-    
-    // 检查网络响应是否有效
+
+    // 检查响应是否有效
     if (!response.statusCode) {
       throw new Error('网络连接失败，请检查网络设置或云托管服务状态')
     }
-    
+
     // 业务状态码判断
     if (response.statusCode === 200 && response.data && response.data.code !== 200) {
       throw new Error(response.data.message || '请求失败')
     }
-    
+
     if (response.statusCode === 401) {
       throw new Error('未授权，请重新登录')
     }
-    
+
     if (response.statusCode >= 500) {
       throw new Error('服务器繁忙，请稍后重试')
     }
-    
+
     // 直接返回 data 字段的内容（后端标准格式）
     return response.data
-    
+
   } catch (err) {
-    console.error(`❌ 请求失败：${fullUrl}`, err)
-    
+    console.error(`❌ 请求失败：${path}`, err)
+
     wx.showToast({
       title: err.message.includes('网络') ? '网络连接失败' : err.message,
       icon: 'none',
       duration: 2000
     })
-    
+
     throw err
   }
 }
@@ -159,22 +106,25 @@ async function request(url, options = {}) {
 module.exports = {
   // 通用方法
   request,
-  
+
   // GET 请求
   get: (url, data = {}, auth = true) => request(url, { method: 'GET', data, auth }),
-  
+
   // POST 请求
   post: (url, data = {}, auth = true) => request(url, { method: 'POST', data, auth }),
-  
+
   // PUT 请求
   put: (url, data = {}, auth = true) => request(url, { method: 'PUT', data, auth }),
-  
+
   // DELETE 请求
   delete: (url, data = {}, auth = true) => request(url, { method: 'DELETE', data, auth }),
-  
+
   // 不需要认证的公共接口
   publicGet: (url, data = {}) => request(url, { method: 'GET', data, auth: false }),
-  
-  // 获取 OpenID 的方法（供外部调用）
-  getOpenId
+
+  // 兼容方法（保留空实现，防止页面调用报错）
+  getOpenId: () => {
+    const app = getApp()
+    return app?.globalData?.openId || ''
+  }
 }
