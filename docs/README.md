@@ -728,6 +728,21 @@ speechSynthesis.speak(utterance)
 
 ---
 
+## 📚 文档索引
+
+| 文档 | 说明 |
+|------|------|
+| `docs/CHANGELOG.md` | 变更日志 — 每次更新和 Bug 修复记录 |
+| `docs/ARCHITECTURE.md` | 系统架构 — 前后端架构图、通信方式、部署架构 |
+| `docs/DATABASE.md` | 数据库设计 — 9 张表结构、字段说明、SM-2 核心字段 |
+| `docs/DESIGN.md` | 设计文档 — SM-2 算法公式、学习模式设计、统计设计 |
+| `docs/USER_GUIDE.md` | 用户指南 — 功能说明、学习流程、常见问题 |
+| `docs/miniapp-api-guide.md` | API 对接指南 — 所有接口文档 |
+| `docs/RELEASE_CHECKLIST.md` | 发布检查清单 — 上线前逐项确认 |
+| `docs/MIGRATION_COMPLETE.md` | 迁移报告 — 从云函数到云托管的迁移总结 |
+
+---
+
 ## 附录
 
 ### A. 完整 API 接口文档
